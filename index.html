@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>교우관계분석기 연수용</title>
+  <title>교우관계분석기</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vis-network@9.1.9/dist/vis-network.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
   <script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.9/dist/vis-network.min.js"></script>
   <style>
     :root{
@@ -15,18 +16,18 @@
       --radius:18px;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"Pretendard",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
     .wrap{max-width:1440px;margin:0 auto;padding:24px}
     .hero{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;background:linear-gradient(135deg,#ffffff,#eef5ff);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:0 10px 30px rgba(15,23,42,.06)}
-    .hero h1{margin:0 0 8px;font-size:28px;letter-spacing:-.03em}.hero p{margin:0;color:var(--muted)}
-    .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;background:var(--primary-soft);color:#1d4ed8;font-size:13px;font-weight:700;white-space:nowrap}
+    .hero h1{margin:0 0 8px;font-size:30px;letter-spacing:-.04em;font-weight:900}.hero p{margin:0;color:var(--muted);font-size:15px}
+    .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;background:var(--primary-soft);color:#1d4ed8;font-size:13px;font-weight:800;white-space:nowrap}
     .upload-card{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:0 8px 24px rgba(15,23,42,.05)}
-    .upload-grid{display:grid;grid-template-columns:minmax(260px,1fr) 1.3fr;gap:18px;align-items:stretch}.upload-box{border:2px dashed #bfdbfe;border-radius:18px;background:#f8fbff;padding:18px}.upload-box input{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:white;font-size:15px}.guide-list{margin:0;padding-left:20px;color:var(--muted);font-size:14px}.guide-list strong{color:var(--text)}
+    .upload-grid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(300px,.9fr);gap:18px;align-items:stretch}.upload-box{border:2px dashed #bfdbfe;border-radius:20px;background:#f8fbff;padding:18px}.upload-box input{width:100%;border:1px solid var(--line);border-radius:14px;padding:12px;background:white;font-size:15px}.survey-panel{border:1px solid var(--line);border-radius:20px;background:linear-gradient(135deg,#ffffff,#f8fbff);padding:18px;height:100%}.survey-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}.primary-link,.soft-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;padding:10px 14px;font-size:14px;font-weight:900;text-decoration:none;border:1px solid var(--line);cursor:pointer}.primary-link{background:var(--primary);color:white;border-color:var(--primary)}.soft-btn{background:#fff;color:var(--primary)}.link-editor{display:none;margin-top:12px;gap:8px}.link-editor.show{display:flex}.link-editor input{flex:1;min-width:180px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px}.guide-list{margin:0;padding-left:20px;color:var(--muted);font-size:14px}.guide-list strong{color:var(--text)}
     .status{margin-top:12px;border-radius:12px;padding:12px 14px;background:#f8fafc;border:1px solid var(--line);color:var(--muted);font-size:14px;white-space:pre-line}.status.ok{background:#ecfdf5;border-color:#bbf7d0;color:#166534}.status.err{background:#fef2f2;border-color:#fecaca;color:#991b1b}.status.warn{background:#fffbeb;border-color:#fed7aa;color:#92400e}
     .dashboard{display:none;margin-top:18px}.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}.round-control{display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--line);border-radius:14px;padding:10px 12px}.round-control label{font-weight:700}.round-control select{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:15px;background:white}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab-btn{border:1px solid var(--line);background:#fff;color:var(--muted);padding:10px 14px;border-radius:999px;font-weight:700;cursor:pointer}.tab-btn.active{background:var(--primary);border-color:var(--primary);color:white}.panel{display:none}.panel.active{display:block}
     .metrics{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:12px;margin-bottom:14px}.metric{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(15,23,42,.04)}.metric .label{font-size:13px;color:var(--muted);font-weight:700}.metric .value{margin-top:5px;font-size:28px;font-weight:800;letter-spacing:-.03em}.metric .hint{font-size:12px;color:var(--muted);margin-top:2px}
     .main-grid{display:grid;grid-template-columns:minmax(600px,1.45fr) minmax(340px,.85fr);gap:14px}.card{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 8px 24px rgba(15,23,42,.04)}.card h2{margin:0 0 12px;font-size:18px;letter-spacing:-.02em}.card h3{margin:0 0 10px;font-size:15px}.subtle{color:var(--muted);font-size:13px}.network-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.filter-chip{display:inline-flex;gap:6px;align-items:center;background:#f8fafc;border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:13px}.filter-chip input{margin:0}#network{width:100%;height:620px;border:1px solid var(--line);border-radius:16px;background:#fbfdff}.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}.legend span{display:inline-flex;align-items:center;gap:6px}.dot{width:12px;height:12px;border-radius:50%;display:inline-block}.line-sample{width:24px;height:3px;border-radius:99px;display:inline-block}.stack{display:grid;gap:14px}.signal-list{display:grid;gap:8px}.student-pill{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);background:#f8fafc;border-radius:14px;padding:10px 12px}.student-pill strong{font-weight:800}.student-pill small{color:var(--muted)}.wordcloud{min-height:145px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;padding:10px;background:#f8fafc;border-radius:16px}.word{font-weight:800;color:#1d4ed8}.callout{background:#eef6ff;border:1px solid #bfdbfe;border-radius:14px;padding:12px;margin-bottom:12px;color:#1e3a8a;font-weight:700}
-    .relationship-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.rel-box{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}.rel-box.green{background:#f0fdf4}.rel-box.blue{background:#eff6ff}.rel-box.red{background:#fef2f2}.rel-box ul{margin:0;padding-left:18px}.rel-box li{margin:6px 0}.scroll{overflow:auto;border:1px solid var(--line);border-radius:16px;background:white}.matrix-table{border-collapse:collapse;min-width:920px;width:100%;font-size:13px}.matrix-table th,.matrix-table td{border:1px solid #e2e8f0;padding:8px;vertical-align:top}.matrix-table th{background:#f8fafc;position:sticky;top:0;z-index:1}.matrix-table th:first-child{position:sticky;left:0;z-index:2}.matrix-table td:first-child{position:sticky;left:0;background:#f8fafc;font-weight:700}.chip{display:inline-block;margin:1px 2px 1px 0;border-radius:999px;padding:2px 7px;font-size:12px;font-weight:700}.chip.pos{background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe}.chip.neg{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}.response-grid{display:grid;grid-template-columns:300px 1fr;gap:14px}.student-list{max-height:620px;overflow:auto}.student-btn{width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer}.student-btn.active{background:var(--primary-soft);border-color:#93c5fd;color:#1d4ed8;font-weight:800}.q-card{border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:10px}.q-card h4{margin:0 0 8px}.q-card ul{margin:0;padding-left:20px}.raw-table{border-collapse:collapse;width:100%;font-size:13px}.raw-table th,.raw-table td{border:1px solid #e2e8f0;padding:8px;text-align:left}.raw-table th{background:#f8fafc}.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px;background:#f8fafc}.footer-note{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
+    .relationship-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.rel-box{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}.rel-box.green{background:#f0fdf4}.rel-box.blue{background:#eff6ff}.rel-box.red{background:#fef2f2}.rel-box ul{margin:0;padding-left:18px}.rel-box li{margin:6px 0}.scroll{overflow:auto;border:1px solid var(--line);border-radius:16px;background:white}.matrix-table{border-collapse:collapse;min-width:920px;width:100%;font-size:13px}.matrix-table th,.matrix-table td{border:1px solid #e2e8f0;padding:8px;vertical-align:middle}.matrix-table th{background:#f8fafc;position:sticky;top:0;z-index:1;white-space:nowrap}.matrix-table th:first-child{position:sticky;left:0;z-index:2}.matrix-table td:first-child{position:sticky;left:0;background:#f8fafc;font-weight:800;white-space:nowrap;text-align:left}.matrix-table td:not(:first-child){text-align:center}.chip{display:inline-block;margin:1px 2px 1px 0;border-radius:999px;padding:2px 7px;font-size:12px;font-weight:700}.chip.pos{background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe}.chip.neg{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}.response-grid{display:grid;grid-template-columns:300px 1fr;gap:14px}.student-list{max-height:620px;overflow:auto}.student-btn{width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer}.student-btn.active{background:var(--primary-soft);border-color:#93c5fd;color:#1d4ed8;font-weight:800}.q-card{border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;background:linear-gradient(180deg,#fff,#fbfdff)}.q-card h4{margin:0 0 10px;display:flex;align-items:center;gap:8px}.q-label{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;background:var(--primary-soft);color:#1d4ed8;font-size:13px;font-weight:900}.q-card ul{margin:0;padding:0;list-style:none}.response-line{display:flex;align-items:flex-start;gap:8px;justify-content:space-between;border-top:1px dashed #e2e8f0;padding:8px 0}.response-line:first-child{border-top:0}.response-line strong{white-space:nowrap}.response-reason{color:var(--muted);text-align:right}.raw-toggle{border:1px solid var(--line);border-radius:16px;background:white;margin-top:14px;overflow:hidden}.raw-toggle summary{cursor:pointer;padding:16px 18px;font-weight:900}.raw-toggle summary::marker{color:var(--primary)}.raw-toggle .scroll{border-left:0;border-right:0;border-bottom:0;border-radius:0}.raw-table{border-collapse:collapse;width:100%;font-size:13px}.raw-table th,.raw-table td{border:1px solid #e2e8f0;padding:8px;text-align:left}.raw-table th{background:#f8fafc}.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px;background:#f8fafc}.footer-note{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
 
     .dashboard .card{transition:box-shadow .2s ease, transform .2s ease}.section-note{margin:-4px 0 12px;color:var(--muted);font-size:13px}.signal-section{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fbfdff}.signal-section + .signal-section{margin-top:12px}.signal-section.low{background:#f8fbff}.signal-section.warn{background:#fff7f7}.signal-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.signal-heading strong{font-size:14px}.student-pill{box-shadow:0 2px 8px rgba(15,23,42,.03)}.student-pill.warn{border-color:#fecaca;background:#fff7f7}.student-pill.low{border-color:#bfdbfe;background:#f8fbff}.wordcloud{min-height:180px;gap:10px 14px;padding:18px;background:linear-gradient(135deg,#f8fafc,#eef6ff)}.word{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-weight:900;color:#1d4ed8;background:rgba(219,234,254,.5);line-height:1.1}.word small{font-size:11px;color:#64748b;margin-left:4px;font-weight:700}.chip{border:0;cursor:pointer;font-family:inherit}.chip:hover{filter:brightness(.96);transform:translateY(-1px)}.matrix-table td{min-width:74px}.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal-backdrop.show{display:flex}.modal{width:min(620px,100%);background:white;border-radius:22px;border:1px solid var(--line);box-shadow:0 24px 80px rgba(15,23,42,.25);padding:20px}.modal h3{margin:0 0 8px;font-size:18px}.modal-body{border:1px solid var(--line);border-radius:16px;background:#f8fafc;padding:14px;margin-top:12px}.modal-close{border:1px solid var(--line);background:white;border-radius:10px;padding:8px 12px;cursor:pointer;font-weight:700}.student-detail-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}.mode-btn{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:8px 12px;font-weight:800;cursor:pointer}.mode-btn.active{background:var(--primary);border-color:var(--primary);color:white}.summary-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 14px}.summary-strip .mini{border:1px solid var(--line);border-radius:14px;background:#f8fafc;padding:10px;text-align:center}.summary-strip .mini strong{display:block;font-size:18px}.received-tag{display:inline-flex;border-radius:999px;padding:2px 7px;margin-left:4px;font-size:12px;font-weight:700}.received-tag.pos{background:#dbeafe;color:#1e40af}.received-tag.neg{background:#fee2e2;color:#991b1b}
     @media (max-width:1100px){.upload-grid,.main-grid,.response-grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}#network{height:520px}.relationship-grid{grid-template-columns:1fr}}@media (max-width:640px){.wrap{padding:14px}.hero{display:block}.metrics{grid-template-columns:1fr}.card{padding:14px}.tab-btn{font-size:13px;padding:8px 10px}}
@@ -36,7 +37,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <h1>교우관계분석기 <span style="color:var(--primary)">연수용</span></h1>
+        <h1>교우관계분석기</h1>
         <p>학생 설문 결과 Excel 파일을 업로드하면 소시오그램, 관계 매트릭스, 관계 유형, 학생별 응답을 브라우저에서 바로 분석합니다.</p>
       </div>
       <span class="badge">📁 HTML + Excel 업로드형</span>
@@ -49,14 +50,17 @@
           <input id="fileInput" type="file" accept=".xlsx,.xls" />
           <div id="loadStatus" class="status">파일을 선택하면 이 브라우저 안에서만 분석합니다. 서버로 업로드하지 않습니다.</div>
         </div>
-        <div>
-          <h2 style="margin:0 0 10px;font-size:18px">필수 시트 구조</h2>
-          <ul class="guide-list">
-            <li><strong>설문응답_RAW</strong>, <strong>Form Responses 1</strong>, <strong>설문지 응답 시트</strong>처럼 한 학생의 응답이 한 행에 들어간 구글 설문형 원자료를 읽습니다.</li>
-            <li>권장 열 이름: <strong>타임스탬프, 회차, 응답자, Q1_놀이 [학생명], Q1_놀이 [직접 쓰기]</strong> 형태입니다.</li>
-            <li><strong>Students</strong> 또는 학생명단 시트가 있으면 번호·성별을 함께 읽고, 없으면 원자료의 응답자와 열 이름에서 학생 명단을 자동 추정합니다.</li>
-            <li>기존 분석용 <strong>Responses</strong>/<strong>NormalizedResponses</strong> 시트도 계속 지원합니다. Q1~Q5는 긍정 관계, Q6은 불편감 관계로 분석합니다.</li>
-          </ul>
+        <div class="survey-panel">
+          <h2 style="margin:0 0 10px;font-size:18px">설문 링크</h2>
+          <p class="subtle" style="margin:0">학생 설문을 진행한 뒤, 응답 결과 Excel 파일을 내려받아 왼쪽에 업로드하세요.</p>
+          <div class="survey-actions">
+            <a id="surveyLink" class="primary-link" href="https://script.google.com/a/macros/gsn.es.kr/s/AKfycbzJiRfTnk2j2bsclZ7JJwNzQChzh0YG9Drdk6kLfL89KfEjyZXgCw80z6QjqaZ1DLclAw/exec" target="_blank" rel="noopener">설문 링크 바로가기</a>
+            <button type="button" class="soft-btn" id="editSurveyLinkBtn">링크 바꾸기</button>
+          </div>
+          <div class="link-editor" id="linkEditor">
+            <input id="surveyLinkInput" type="url" value="https://script.google.com/a/macros/gsn.es.kr/s/AKfycbzJiRfTnk2j2bsclZ7JJwNzQChzh0YG9Drdk6kLfL89KfEjyZXgCw80z6QjqaZ1DLclAw/exec" aria-label="설문 링크 주소" />
+            <button type="button" class="soft-btn" id="saveSurveyLinkBtn">적용</button>
+          </div>
         </div>
       </div>
     </section>
@@ -135,10 +139,10 @@
             <div id="studentResponseDetail" class="empty">왼쪽에서 학생을 선택하세요.</div>
           </div>
         </div>
-        <div class="card" style="margin-top:14px">
-          <h2>전체 응답 원본 표</h2>
+        <details class="raw-toggle">
+          <summary>전체 응답 원본 표 열기</summary>
           <div class="scroll" id="rawTableWrap"></div>
-        </div>
+        </details>
       </div>
 
       <div class="modal-backdrop" id="reasonModal" aria-hidden="true">
@@ -167,7 +171,7 @@
     Q5:{short:'리더십', label:'사회적 영향력', type:'positive'},
     Q6:{short:'불편감', label:'불편감 응답 관계', type:'negative'}
   };
-  const state = {students:[], responses:[], rounds:[], currentRound:'', network:null, filters:{Q1:true,Q2:true,Q3:true,Q4:true,Q5:true,Q6:true}, selectedStudentId:null, selectedStudentView:'sent', matrixDetails:{}};
+  const state = {students:[], responses:[], rounds:[], currentRound:'', network:null, overallView:true, filters:{Q1:true,Q2:true,Q3:true,Q4:true,Q5:true,Q6:true}, selectedStudentId:null, selectedStudentView:'sent', matrixDetails:{}};
 
   const $ = sel => document.querySelector(sel);
   const $$ = sel => Array.from(document.querySelectorAll(sel));
@@ -506,11 +510,22 @@
         if(aNegB && bNegA) mutualNegative.push(`${a.name} ↔ ${b.name} (${pairLabel(a.studentId,b.studentId)} / ${pairLabel(b.studentId,a.studentId)})`);
       }
     }
+    const asymSet = new Set();
+    responses.filter(r => r.relationType === 'negative').forEach(r => {
+      if(negAdj[r.targetId]?.has(r.respondentId)) return;
+      const key = 'neg:' + r.respondentId + '>' + r.targetId;
+      if(asymSet.has(key)) return;
+      asymSet.add(key);
+      asymmetric.push(`${byId[r.respondentId].name} → ${byId[r.targetId].name} (일방 불편감, ${QUESTIONS[r.questionId].short})`);
+    });
     responses.filter(r => r.relationType === 'positive').forEach(r => {
       if(posAdj[r.targetId]?.has(r.respondentId)) return;
       const reverseNeg = negAdj[r.targetId]?.has(r.respondentId);
       const targetResponded = responses.some(x => x.respondentId === r.targetId);
       const suffix = reverseNeg ? '상대는 불편감 응답' : (targetResponded ? '상대의 상호 지목 없음' : '상대 응답 없음');
+      const key = 'pos:' + r.respondentId + '>' + r.targetId + ':' + r.questionId;
+      if(asymSet.has(key)) return;
+      asymSet.add(key);
       asymmetric.push(`${byId[r.respondentId].name} → ${byId[r.targetId].name} (${QUESTIONS[r.questionId].short}, ${suffix})`);
     });
 
@@ -546,10 +561,20 @@
   }
 
   function renderFilters(){
-    $('#filters').innerHTML = Object.entries(QUESTIONS).map(([qid,q]) => `
-      <label class="filter-chip"><input type="checkbox" data-filter="${qid}" ${state.filters[qid]?'checked':''}> ${q.short}</label>
+    const individual = Object.entries(QUESTIONS).map(([qid,q]) => `
+      <label class="filter-chip"><input type="checkbox" data-filter="${qid}" ${state.filters[qid]?'checked':''} ${state.overallView?'disabled':''}> ${q.short}</label>
     `).join('');
-    $$('#filters input').forEach(chk => chk.addEventListener('change', e => {
+    $('#filters').innerHTML = `
+      <label class="filter-chip" style="background:var(--primary-soft);color:#1d4ed8;font-weight:900"><input type="checkbox" data-overall="1" ${state.overallView?'checked':''}> 전체보기</label>
+      ${individual}
+    `;
+    const overall = $('#filters input[data-overall]');
+    overall.addEventListener('change', e => {
+      state.overallView = e.target.checked;
+      renderFilters();
+      renderNetwork(analyze(state.currentRound));
+    });
+    $$('#filters input[data-filter]').forEach(chk => chk.addEventListener('change', e => {
       state.filters[e.target.dataset.filter] = e.target.checked;
       renderNetwork(analyze(state.currentRound));
     }));
@@ -562,25 +587,25 @@
     const nodes = data.students.map(s => {
       const st = data.stats[s.studentId];
       const isMale = s.gender.includes('남');
-      return {id:s.studentId, label:`${s.number}.\n${s.name}`, title:`${s.name}\n긍정 받은 수: ${st.posIn}\n불편감 받은 수: ${st.negIn}`, size:28 + Math.min(30, st.totalIn * 2.2), color:{background:isMale?'#86efac':'#fde68a', border:isMale?'#16a34a':'#ca8a04'}, font:{size:18, color:'#0f172a', face:'system-ui', bold:{color:'#0f172a'}, strokeWidth:4, strokeColor:'#ffffff', vadjust:0}};
+      return {id:s.studentId, label:`${s.name}`, title:`${s.number}. ${s.name}\n긍정 받은 수: ${st.posIn}\n불편감 받은 수: ${st.negIn}`, size:24 + Math.min(42, st.totalIn * 3.2), color:{background:isMale?'#86efac':'#fde68a', border:isMale?'#16a34a':'#ca8a04'}, font:{size:22, color:'#0f172a', face:'Pretendard, system-ui', bold:{color:'#0f172a'}, strokeWidth:5, strokeColor:'#ffffff', vadjust:0}};
     });
-    const visible = data.responses.filter(r => state.filters[r.questionId]);
+    const visible = state.overallView ? data.responses : data.responses.filter(r => state.filters[r.questionId]);
     const grouped = {};
     visible.forEach(r => {
-      const key = `${r.respondentId}>${r.targetId}>${r.relationType}`;
+      const key = state.overallView ? `${r.respondentId}>${r.targetId}>${r.relationType}` : `${r.respondentId}>${r.targetId}>${r.relationType}>${r.questionId}`;
       grouped[key] = grouped[key] || {from:r.respondentId, to:r.targetId, relationType:r.relationType, qs:[], tags:[]};
-      grouped[key].qs.push(r.questionId); if(r.tags) grouped[key].tags.push(r.tags);
+      grouped[key].qs.push(r.questionId); if(r.tags || r.customReason) grouped[key].tags.push(getReasonText(r));
     });
     const edges = Object.values(grouped).map((g, idx) => {
-      const qShort = Array.from(new Set(g.qs)).map(q=>QUESTIONS[q].short).join(', ');
+      const qShort = state.overallView ? (g.relationType === 'positive' ? '긍정' : '불편감') : Array.from(new Set(g.qs)).map(q=>QUESTIONS[q].short).join(', ');
       const isPos = g.relationType === 'positive';
-      return {id:'e'+idx, from:g.from, to:g.to, arrows:'to', label:qShort, title:g.tags.join('\n'), color:{color:isPos?'#2563eb':'#ef4444'}, width:isPos?2.0:2.4, dashes:!isPos, font:{size:11, align:'middle', color:'#334155'}};
+      return {id:'e'+idx, from:g.from, to:g.to, arrows:'to', label:qShort, title:g.tags.join('\n'), color:{color:isPos?'#2563eb':'#ef4444'}, width:isPos?2.1:2.7, dashes:!isPos, font:{size:12, align:'middle', color:'#334155', strokeWidth:3, strokeColor:'#ffffff'}};
     });
     state.network = new vis.Network(container, {nodes:new vis.DataSet(nodes), edges:new vis.DataSet(edges)}, {
       interaction:{hover:true, tooltipDelay:120},
       physics:{enabled:true, solver:'forceAtlas2Based', forceAtlas2Based:{gravitationalConstant:-90, centralGravity:.015, springLength:150, springConstant:.08}, stabilization:{iterations:120}},
       edges:{smooth:{type:'dynamic'}, arrows:{to:{enabled:true, scaleFactor:.8}}},
-      nodes:{shape:'circle', borderWidth:2, shadow:false, font:{size:18}}
+      nodes:{shape:'dot', borderWidth:2, shadow:false, font:{size:22}}
     });
   }
 
@@ -621,7 +646,7 @@
       }).join('');
       return `<tr><td>${from.number}. ${safeHtml(from.name)}</td>${cells}</tr>`;
     }).join('');
-    const header = `<tr><th>응답자 \ 선택친구</th>${data.students.map(s=>`<th>${s.number}. ${safeHtml(s.name)}</th>`).join('')}</tr>`;
+    const header = `<tr><th>응답자 / 선택친구</th>${data.students.map(s=>`<th>${s.number}. ${safeHtml(s.name)}</th>`).join('')}</tr>`;
     $('#matrixWrap').innerHTML = `<table class="matrix-table">${header}${rows}</table>`;
     $$('#matrixWrap .matrix-chip').forEach(btn => btn.addEventListener('click', e => {
       const r = state.matrixDetails[e.currentTarget.dataset.reasonId];
@@ -649,7 +674,7 @@
     const list = arr => arr.length ? `<ul>${arr.slice(0,12).map(x=>`<li>${safeHtml(x)}</li>`).join('')}</ul>` : '<p class="subtle">해당 관계가 없습니다.</p>';
     $('#relationshipGrid').innerHTML = `
       <div class="rel-box green"><h2>상호 긍정형</h2><p class="subtle">서로를 긍정 문항에서 지목한 관계</p>${list(data.mutualPositive)}</div>
-      <div class="rel-box blue"><h2>비대칭형</h2><p class="subtle">한쪽의 긍정 지목이 상호로 이어지지 않은 관계</p>${list(data.asymmetric)}</div>
+      <div class="rel-box blue"><h2>비대칭형</h2><p class="subtle">일방 불편감 관계를 우선 표시하고, 이어서 상호로 이어지지 않은 긍정 지목을 보여줍니다.</p>${list(data.asymmetric)}</div>
       <div class="rel-box red"><h2>상호 불편감형</h2><p class="subtle">서로를 불편감 문항에서 지목한 관계</p>${list(data.mutualNegative)}</div>`;
   }
 
@@ -697,9 +722,9 @@
       const rs = data.responses.filter(r=>r.respondentId===studentId && r.questionId===qid);
       const items = rs.length ? rs.map(r => {
         const target = data.byId[r.targetId];
-        return `<li><strong>${target ? target.number+'. '+safeHtml(target.name) : safeHtml(r.targetId)}</strong><br><span class="subtle">이유: ${safeHtml(getReasonText(r))}</span></li>`;
-      }).join('') : '<li class="subtle">선택 없음</li>';
-      return `<div class="q-card"><h4>${qid}. ${q.label}</h4><ul>${items}</ul></div>`;
+        return `<li class="response-line"><strong>${target ? target.number+'. '+safeHtml(target.name) : safeHtml(r.targetId)}</strong><span class="response-reason">${safeHtml(getReasonText(r))}</span></li>`;
+      }).join('') : '<li class="response-line"><span class="subtle">선택 없음</span></li>';
+      return `<div class="q-card"><h4><span class="q-label">${qid}</span> ${q.label}</h4><ul>${items}</ul></div>`;
     }).join('');
   }
 
@@ -710,9 +735,9 @@
         const respondent = data.byId[r.respondentId];
         const tagClass = r.relationType === 'positive' ? 'pos' : 'neg';
         const label = r.relationType === 'positive' ? '긍정' : '불편감';
-        return `<li><strong>${respondent ? respondent.number+'. '+safeHtml(respondent.name) : safeHtml(r.respondentId)}</strong><span class="received-tag ${tagClass}">${label}</span><br><span class="subtle">이유: ${safeHtml(getReasonText(r))}</span></li>`;
-      }).join('') : '<li class="subtle">지목받은 응답 없음</li>';
-      return `<div class="q-card"><h4>${qid}. ${q.label}</h4><ul>${items}</ul></div>`;
+        return `<li class="response-line"><strong>${respondent ? respondent.number+'. '+safeHtml(respondent.name) : safeHtml(r.respondentId)} <span class="received-tag ${tagClass}">${label}</span></strong><span class="response-reason">${safeHtml(getReasonText(r))}</span></li>`;
+      }).join('') : '<li class="response-line"><span class="subtle">지목받은 응답 없음</span></li>';
+      return `<div class="q-card"><h4><span class="q-label">${qid}</span> ${q.label}</h4><ul>${items}</ul></div>`;
     }).join('');
   }
 
@@ -733,6 +758,21 @@
   $('#reasonModalClose').addEventListener('click', closeReasonModal);
   $('#reasonModal').addEventListener('click', e => { if(e.target.id === 'reasonModal') closeReasonModal(); });
   document.addEventListener('keydown', e => { if(e.key === 'Escape' && $('#reasonModal').classList.contains('show')) closeReasonModal(); });
+
+
+  const surveyLink = $('#surveyLink');
+  const surveyLinkInput = $('#surveyLinkInput');
+  $('#editSurveyLinkBtn').addEventListener('click', () => {
+    $('#linkEditor').classList.toggle('show');
+    surveyLinkInput.focus();
+  });
+  $('#saveSurveyLinkBtn').addEventListener('click', () => {
+    const url = norm(surveyLinkInput.value);
+    if(!url){ showStatus('설문 링크 주소를 입력해 주세요.', 'warn'); return; }
+    surveyLink.href = url;
+    $('#linkEditor').classList.remove('show');
+    showStatus('설문 링크가 현재 화면에 적용되었습니다. 다시 열면 기본 링크로 돌아갑니다.', 'ok');
+  });
 
   $('#fileInput').addEventListener('change', async (event) => {
     const file = event.target.files[0];
