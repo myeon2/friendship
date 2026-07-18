@@ -10,7 +10,7 @@
   <style>
     :root{
       --bg:#f4f7fb; --card:#ffffff; --text:#1f2937; --muted:#64748b; --line:#dbe4f0;
-      --primary:#2563eb; --primary-soft:#dbeafe; --danger:#2563eb; --positive:#ef4444; --negative:#2563eb;
+      --primary:#2563eb; --primary-soft:#dbeafe; --danger:#ef4444; --positive:#2563eb; --negative:#ef4444;
       --male:#22c55e; --female:#facc15; --warn:#f97316; --soft-red:#fee2e2; --soft-blue:#dbeafe; --soft-green:#dcfce7;
       --radius:18px;
     }
@@ -26,7 +26,9 @@
     .dashboard{display:none;margin-top:18px}.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}.round-control{display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--line);border-radius:14px;padding:10px 12px}.round-control label{font-weight:700}.round-control select{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:15px;background:white}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab-btn{border:1px solid var(--line);background:#fff;color:var(--muted);padding:10px 14px;border-radius:999px;font-weight:700;cursor:pointer}.tab-btn.active{background:var(--primary);border-color:var(--primary);color:white}.panel{display:none}.panel.active{display:block}
     .metrics{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:12px;margin-bottom:14px}.metric{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(15,23,42,.04)}.metric .label{font-size:13px;color:var(--muted);font-weight:700}.metric .value{margin-top:5px;font-size:28px;font-weight:800;letter-spacing:-.03em}.metric .hint{font-size:12px;color:var(--muted);margin-top:2px}
     .main-grid{display:grid;grid-template-columns:minmax(600px,1.45fr) minmax(340px,.85fr);gap:14px}.card{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 8px 24px rgba(15,23,42,.04)}.card h2{margin:0 0 12px;font-size:18px;letter-spacing:-.02em}.card h3{margin:0 0 10px;font-size:15px}.subtle{color:var(--muted);font-size:13px}.network-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.filter-chip{display:inline-flex;gap:6px;align-items:center;background:#f8fafc;border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:13px}.filter-chip input{margin:0}#network{width:100%;height:620px;border:1px solid var(--line);border-radius:16px;background:#fbfdff}.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}.legend span{display:inline-flex;align-items:center;gap:6px}.dot{width:12px;height:12px;border-radius:50%;display:inline-block}.line-sample{width:24px;height:3px;border-radius:99px;display:inline-block}.stack{display:grid;gap:14px}.signal-list{display:grid;gap:8px}.student-pill{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);background:#f8fafc;border-radius:14px;padding:10px 12px}.student-pill strong{font-weight:800}.student-pill small{color:var(--muted)}.wordcloud{min-height:145px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;padding:10px;background:#f8fafc;border-radius:16px}.word{font-weight:800;color:#1d4ed8}.callout{background:#eef6ff;border:1px solid #bfdbfe;border-radius:14px;padding:12px;margin-bottom:12px;color:#1e3a8a;font-weight:700}
-    .relationship-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.rel-box{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}.rel-box.green{background:#f0fdf4}.rel-box.blue{background:#eff6ff}.rel-box.red{background:#fef2f2}.rel-box ul{margin:0;padding-left:18px}.rel-box li{margin:6px 0}.scroll{overflow:auto;border:1px solid var(--line);border-radius:16px;background:white}.matrix-table{border-collapse:collapse;min-width:920px;width:100%;font-size:13px}.matrix-table th,.matrix-table td{border:1px solid #e2e8f0;padding:8px;vertical-align:top}.matrix-table th{background:#f8fafc;position:sticky;top:0;z-index:1}.matrix-table th:first-child{position:sticky;left:0;z-index:2}.matrix-table td:first-child{position:sticky;left:0;background:#f8fafc;font-weight:700}.chip{display:inline-block;margin:1px 2px 1px 0;border-radius:999px;padding:2px 7px;font-size:12px;font-weight:700}.chip.pos{background:#fee2e2;color:#991b1b}.chip.neg{background:#dbeafe;color:#1e40af}.response-grid{display:grid;grid-template-columns:300px 1fr;gap:14px}.student-list{max-height:620px;overflow:auto}.student-btn{width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer}.student-btn.active{background:var(--primary-soft);border-color:#93c5fd;color:#1d4ed8;font-weight:800}.q-card{border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:10px}.q-card h4{margin:0 0 8px}.q-card ul{margin:0;padding-left:20px}.raw-table{border-collapse:collapse;width:100%;font-size:13px}.raw-table th,.raw-table td{border:1px solid #e2e8f0;padding:8px;text-align:left}.raw-table th{background:#f8fafc}.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px;background:#f8fafc}.footer-note{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
+    .relationship-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.rel-box{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}.rel-box.green{background:#f0fdf4}.rel-box.blue{background:#eff6ff}.rel-box.red{background:#fef2f2}.rel-box ul{margin:0;padding-left:18px}.rel-box li{margin:6px 0}.scroll{overflow:auto;border:1px solid var(--line);border-radius:16px;background:white}.matrix-table{border-collapse:collapse;min-width:920px;width:100%;font-size:13px}.matrix-table th,.matrix-table td{border:1px solid #e2e8f0;padding:8px;vertical-align:top}.matrix-table th{background:#f8fafc;position:sticky;top:0;z-index:1}.matrix-table th:first-child{position:sticky;left:0;z-index:2}.matrix-table td:first-child{position:sticky;left:0;background:#f8fafc;font-weight:700}.chip{display:inline-block;margin:1px 2px 1px 0;border-radius:999px;padding:2px 7px;font-size:12px;font-weight:700}.chip.pos{background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe}.chip.neg{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}.response-grid{display:grid;grid-template-columns:300px 1fr;gap:14px}.student-list{max-height:620px;overflow:auto}.student-btn{width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer}.student-btn.active{background:var(--primary-soft);border-color:#93c5fd;color:#1d4ed8;font-weight:800}.q-card{border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:10px}.q-card h4{margin:0 0 8px}.q-card ul{margin:0;padding-left:20px}.raw-table{border-collapse:collapse;width:100%;font-size:13px}.raw-table th,.raw-table td{border:1px solid #e2e8f0;padding:8px;text-align:left}.raw-table th{background:#f8fafc}.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px;background:#f8fafc}.footer-note{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
+
+    .dashboard .card{transition:box-shadow .2s ease, transform .2s ease}.section-note{margin:-4px 0 12px;color:var(--muted);font-size:13px}.signal-section{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fbfdff}.signal-section + .signal-section{margin-top:12px}.signal-section.low{background:#f8fbff}.signal-section.warn{background:#fff7f7}.signal-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.signal-heading strong{font-size:14px}.student-pill{box-shadow:0 2px 8px rgba(15,23,42,.03)}.student-pill.warn{border-color:#fecaca;background:#fff7f7}.student-pill.low{border-color:#bfdbfe;background:#f8fbff}.wordcloud{min-height:180px;gap:10px 14px;padding:18px;background:linear-gradient(135deg,#f8fafc,#eef6ff)}.word{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-weight:900;color:#1d4ed8;background:rgba(219,234,254,.5);line-height:1.1}.word small{font-size:11px;color:#64748b;margin-left:4px;font-weight:700}.chip{border:0;cursor:pointer;font-family:inherit}.chip:hover{filter:brightness(.96);transform:translateY(-1px)}.matrix-table td{min-width:74px}.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal-backdrop.show{display:flex}.modal{width:min(620px,100%);background:white;border-radius:22px;border:1px solid var(--line);box-shadow:0 24px 80px rgba(15,23,42,.25);padding:20px}.modal h3{margin:0 0 8px;font-size:18px}.modal-body{border:1px solid var(--line);border-radius:16px;background:#f8fafc;padding:14px;margin-top:12px}.modal-close{border:1px solid var(--line);background:white;border-radius:10px;padding:8px 12px;cursor:pointer;font-weight:700}.student-detail-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}.mode-btn{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:8px 12px;font-weight:800;cursor:pointer}.mode-btn.active{background:var(--primary);border-color:var(--primary);color:white}.summary-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 14px}.summary-strip .mini{border:1px solid var(--line);border-radius:14px;background:#f8fafc;padding:10px;text-align:center}.summary-strip .mini strong{display:block;font-size:18px}.received-tag{display:inline-flex;border-radius:999px;padding:2px 7px;margin-left:4px;font-size:12px;font-weight:700}.received-tag.pos{background:#dbeafe;color:#1e40af}.received-tag.neg{background:#fee2e2;color:#991b1b}
     @media (max-width:1100px){.upload-grid,.main-grid,.response-grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}#network{height:520px}.relationship-grid{grid-template-columns:1fr}}@media (max-width:640px){.wrap{padding:14px}.hero{display:block}.metrics{grid-template-columns:1fr}.card{padding:14px}.tab-btn{font-size:13px;padding:8px 10px}}
   </style>
 </head>
@@ -91,11 +93,15 @@
           <div class="stack">
             <div class="card">
               <h2>관찰 필요 신호</h2>
-              <h3>관계 관찰 필요</h3>
-              <div class="signal-list" id="lowSignal"></div>
-              <div style="height:12px"></div>
-              <h3>불편감 집중 신호</h3>
-              <div class="signal-list" id="discomfortSignal"></div>
+              <p class="section-note">받은 지목 수와 불편감 지목 수를 바탕으로 추가 관찰이 필요한 지점을 보여줍니다.</p>
+              <div class="signal-section low">
+                <div class="signal-heading"><strong>관계 관찰 필요</strong><span class="subtle">받은 지목이 적음</span></div>
+                <div class="signal-list" id="lowSignal"></div>
+              </div>
+              <div class="signal-section warn">
+                <div class="signal-heading"><strong>불편감 집중 신호</strong><span class="subtle">Q6 지목 집중</span></div>
+                <div class="signal-list" id="discomfortSignal"></div>
+              </div>
             </div>
             <div class="card">
               <h2>학급의 강점 키워드</h2>
@@ -135,6 +141,18 @@
         </div>
       </div>
 
+      <div class="modal-backdrop" id="reasonModal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reasonModalTitle">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+            <div>
+              <h3 id="reasonModalTitle">응답 사유</h3>
+              <p class="subtle" id="reasonModalMeta"></p>
+            </div>
+            <button type="button" class="modal-close" id="reasonModalClose">닫기</button>
+          </div>
+          <div class="modal-body" id="reasonModalBody"></div>
+        </div>
+      </div>
       <p class="footer-note">분석 결과는 학생을 단정하기 위한 자료가 아니라, 교사의 생활지도와 상담을 돕기 위한 참고 자료입니다.</p>
     </section>
   </div>
@@ -149,7 +167,7 @@
     Q5:{short:'리더십', label:'사회적 영향력', type:'positive'},
     Q6:{short:'불편감', label:'불편감 응답 관계', type:'negative'}
   };
-  const state = {students:[], responses:[], rounds:[], currentRound:'', network:null, filters:{Q1:true,Q2:true,Q3:true,Q4:true,Q5:true,Q6:true}, selectedStudentId:null};
+  const state = {students:[], responses:[], rounds:[], currentRound:'', network:null, filters:{Q1:true,Q2:true,Q3:true,Q4:true,Q5:true,Q6:true}, selectedStudentId:null, selectedStudentView:'sent', matrixDetails:{}};
 
   const $ = sel => document.querySelector(sel);
   const $$ = sel => Array.from(document.querySelectorAll(sel));
@@ -402,6 +420,46 @@
     return {students, responses:result.responses, rounds, skipped:result.skipped, sourceType};
   }
 
+
+  function reasonToKeywords(text){
+    const v = norm(text);
+    if(!v || v.includes('이유 선택') || v.includes('넘어가기')) return [];
+    const rules = [
+      ['관심사', ['관심사','게임','취미']],
+      ['편안함', ['마음이 편','성격이 잘 맞','편해서']],
+      ['재미', ['재미','유머']],
+      ['오래 친함', ['예전부터','저학년','오래']],
+      ['존중', ['의견을 잘 들어','존중']],
+      ['책임감', ['책임감','끝까지']],
+      ['친절한 설명', ['친절','가르쳐']],
+      ['아이디어', ['아이디어','이끌어']],
+      ['배려심', ['배려','다정']],
+      ['친해지고 싶음', ['친해지고']],
+      ['차분함', ['조용','차분','집중']],
+      ['위로', ['속상','위로']],
+      ['묵묵한 도움', ['묵묵','궂은일']],
+      ['도움', ['도와','도움','흔쾌히']],
+      ['고운 말', ['고운 말','무시하지']],
+      ['화해 중재', ['화해','다툼']],
+      ['자신감', ['발표','자신감']],
+      ['공평함', ['공평','규칙','모범']],
+      ['의견 조율', ['의견을 잘 모아','결정']],
+      ['밝은 분위기', ['밝','긍정적']]
+    ];
+    const found = [];
+    rules.forEach(([keyword, needles]) => {
+      if(needles.some(n => v.includes(n))) found.push(keyword);
+    });
+    if(found.length) return Array.from(new Set(found));
+    const fallback = shortenWord(v).replace(/[\[\]{}()]/g,'').slice(0,14);
+    return fallback ? [fallback] : [];
+  }
+
+  function getReasonText(r){
+    const reason = [r.tags, r.customReason].map(norm).filter(Boolean).join(' / ');
+    return reason || '이유 선택 없이 저장';
+  }
+
   function analyze(roundId){
     const students = state.students;
     const byId = Object.fromEntries(students.map(s => [s.studentId, s]));
@@ -416,8 +474,7 @@
       else { stats[r.targetId].negIn++; stats[r.respondentId].negOut++; }
       stats[r.targetId].totalIn++; stats[r.respondentId].totalOut++;
       if(pos){
-        splitTags(r.tags).forEach(t => {
-          if(t.includes('이유 선택') || t.includes('넘어가기')) return;
+        reasonToKeywords([r.tags, r.customReason].filter(Boolean).join('\n')).forEach(t => {
           tagCounts[t] = (tagCounts[t] || 0) + 1;
         });
       }
@@ -505,7 +562,7 @@
     const nodes = data.students.map(s => {
       const st = data.stats[s.studentId];
       const isMale = s.gender.includes('남');
-      return {id:s.studentId, label:`${s.number}. ${s.name}`, title:`${s.name}\n긍정 받은 수: ${st.posIn}\n불편감 받은 수: ${st.negIn}`, size:18 + Math.min(26, st.totalIn * 2.4), color:{background:isMale?'#86efac':'#fde68a', border:isMale?'#16a34a':'#ca8a04'}, font:{size:14, color:'#1f2937'}};
+      return {id:s.studentId, label:`${s.number}.\n${s.name}`, title:`${s.name}\n긍정 받은 수: ${st.posIn}\n불편감 받은 수: ${st.negIn}`, size:28 + Math.min(30, st.totalIn * 2.2), color:{background:isMale?'#86efac':'#fde68a', border:isMale?'#16a34a':'#ca8a04'}, font:{size:18, color:'#0f172a', face:'system-ui', bold:{color:'#0f172a'}, strokeWidth:4, strokeColor:'#ffffff', vadjust:0}};
     });
     const visible = data.responses.filter(r => state.filters[r.questionId]);
     const grouped = {};
@@ -517,30 +574,30 @@
     const edges = Object.values(grouped).map((g, idx) => {
       const qShort = Array.from(new Set(g.qs)).map(q=>QUESTIONS[q].short).join(', ');
       const isPos = g.relationType === 'positive';
-      return {id:'e'+idx, from:g.from, to:g.to, arrows:'to', label:qShort, title:g.tags.join('\n'), color:{color:isPos?'#ef4444':'#2563eb'}, width:isPos?1.7:2.2, dashes:!isPos, font:{size:11, align:'middle', color:'#334155'}};
+      return {id:'e'+idx, from:g.from, to:g.to, arrows:'to', label:qShort, title:g.tags.join('\n'), color:{color:isPos?'#2563eb':'#ef4444'}, width:isPos?2.0:2.4, dashes:!isPos, font:{size:11, align:'middle', color:'#334155'}};
     });
     state.network = new vis.Network(container, {nodes:new vis.DataSet(nodes), edges:new vis.DataSet(edges)}, {
       interaction:{hover:true, tooltipDelay:120},
       physics:{enabled:true, solver:'forceAtlas2Based', forceAtlas2Based:{gravitationalConstant:-90, centralGravity:.015, springLength:150, springConstant:.08}, stabilization:{iterations:120}},
       edges:{smooth:{type:'dynamic'}, arrows:{to:{enabled:true, scaleFactor:.8}}},
-      nodes:{shape:'dot', borderWidth:2, shadow:false}
+      nodes:{shape:'circle', borderWidth:2, shadow:false, font:{size:18}}
     });
   }
 
   function renderSignals(data){
-    $('#lowSignal').innerHTML = data.low.length ? data.low.map(s => `<div class="student-pill"><strong>${s.number}. ${s.name}</strong><small>긍정 ${s.posIn} · 불편감 ${s.negIn}</small></div>`).join('') : '<div class="empty">표시할 학생이 없습니다.</div>';
-    $('#discomfortSignal').innerHTML = data.discomfort.length ? data.discomfort.map(s => `<div class="student-pill"><strong>${s.number}. ${s.name}</strong><small>긍정 ${s.posIn} · 불편감 ${s.negIn}</small></div>`).join('') : '<div class="empty">불편감 지목이 없습니다.</div>';
+    $('#lowSignal').innerHTML = data.low.length ? data.low.map(s => `<div class="student-pill low"><div><strong>${s.number}. ${safeHtml(s.name)}</strong><br><small>받은 지목 ${s.totalIn}건</small></div><small>긍정 ${s.posIn} · 불편감 ${s.negIn}</small></div>`).join('') : '<div class="empty">표시할 학생이 없습니다.</div>';
+    $('#discomfortSignal').innerHTML = data.discomfort.length ? data.discomfort.map(s => `<div class="student-pill warn"><div><strong>${s.number}. ${safeHtml(s.name)}</strong><br><small>불편감 지목 ${s.negIn}건</small></div><small>긍정 ${s.posIn} · 전체 ${s.totalIn}</small></div>`).join('') : '<div class="empty">불편감 지목이 없습니다.</div>';
   }
 
   function renderWordcloud(data){
     const entries = Object.entries(data.tagCounts).sort((a,b)=>b[1]-a[1]).slice(0,18);
     if(!entries.length){ $('#wordSummary').textContent='긍정 이유 태그가 없습니다.'; $('#wordcloud').innerHTML='<span class="subtle">표시할 키워드가 없습니다.</span>'; return; }
     const max = entries[0][1];
-    const top = entries.slice(0,2).map(x=>x[0].replace(/해서|되어|때문에/g,'')).join(' · ');
-    $('#wordSummary').textContent = `이번 회차에서 우리 반의 긍정 관계는 ‘${top}’을 중심으로 나타납니다.`;
+    const top = entries.slice(0,2).map(x=>x[0]).join(' · ');
+    $('#wordSummary').textContent = `이번 회차에서 학생들이 많이 선택한 긍정 이유는 ‘${top}’입니다.`;
     $('#wordcloud').innerHTML = entries.map(([word,count]) => {
-      const size = 14 + Math.round(count / max * 22);
-      return `<span class="word" title="${count}회" style="font-size:${size}px">${safeHtml(shortenWord(word))}</span>`;
+      const size = 14 + Math.round(count / max * 24);
+      return `<span class="word" title="${count}회" style="font-size:${size}px">${safeHtml(word)}<small>${count}</small></span>`;
     }).join('');
   }
   function shortenWord(w){
@@ -549,17 +606,43 @@
   }
 
   function renderMatrix(data){
+    state.matrixDetails = {};
+    let detailIndex = 0;
     const rows = data.students.map(from => {
       const cells = data.students.map(to => {
         if(from.studentId === to.studentId) return '<td style="background:#f8fafc;text-align:center;color:#94a3b8">—</td>';
         const rs = data.responses.filter(r => r.respondentId === from.studentId && r.targetId === to.studentId);
-        const html = rs.map(r => `<span class="chip ${r.relationType==='positive'?'pos':'neg'}">${QUESTIONS[r.questionId].short}</span>`).join('');
+        const html = rs.map(r => {
+          const id = 'm' + (++detailIndex);
+          state.matrixDetails[id] = r;
+          return `<button type="button" class="chip matrix-chip ${r.relationType==='positive'?'pos':'neg'}" data-reason-id="${id}" title="사유 보기">${QUESTIONS[r.questionId].short}</button>`;
+        }).join('');
         return `<td>${html}</td>`;
       }).join('');
       return `<tr><td>${from.number}. ${safeHtml(from.name)}</td>${cells}</tr>`;
     }).join('');
     const header = `<tr><th>응답자 \ 선택친구</th>${data.students.map(s=>`<th>${s.number}. ${safeHtml(s.name)}</th>`).join('')}</tr>`;
     $('#matrixWrap').innerHTML = `<table class="matrix-table">${header}${rows}</table>`;
+    $$('#matrixWrap .matrix-chip').forEach(btn => btn.addEventListener('click', e => {
+      const r = state.matrixDetails[e.currentTarget.dataset.reasonId];
+      if(r) openReasonModal(r, data);
+    }));
+  }
+
+  function openReasonModal(r, data){
+    const respondent = data.byId[r.respondentId];
+    const target = data.byId[r.targetId];
+    const q = QUESTIONS[r.questionId] || {short:r.questionId, label:r.questionId};
+    $('#reasonModalTitle').textContent = `${q.short} 문항 응답 사유`;
+    $('#reasonModalMeta').textContent = `${respondent ? respondent.number+'. '+respondent.name : r.respondentId} → ${target ? target.number+'. '+target.name : r.targetId} · ${r.relationType==='positive'?'긍정 관계':'불편감 관계'}`;
+    $('#reasonModalBody').innerHTML = `<p style="margin:0 0 8px"><strong>${safeHtml(q.label)}</strong></p><p style="margin:0">${safeHtml(getReasonText(r))}</p>`;
+    $('#reasonModal').classList.add('show');
+    $('#reasonModal').setAttribute('aria-hidden','false');
+  }
+
+  function closeReasonModal(){
+    $('#reasonModal').classList.remove('show');
+    $('#reasonModal').setAttribute('aria-hidden','true');
   }
 
   function renderRelationships(data){
@@ -574,22 +657,63 @@
     const selected = state.selectedStudentId || data.students[0]?.studentId;
     state.selectedStudentId = selected;
     $('#studentList').innerHTML = data.students.map(s => {
-      const count = data.responses.filter(r=>r.respondentId===s.studentId).length;
-      return `<button type="button" class="student-btn ${s.studentId===selected?'active':''}" data-student="${s.studentId}">${s.number}. ${safeHtml(s.name)} <span class="subtle">(${count}건)</span></button>`;
+      const sent = data.responses.filter(r=>r.respondentId===s.studentId).length;
+      const received = data.responses.filter(r=>r.targetId===s.studentId).length;
+      return `<button type="button" class="student-btn ${s.studentId===selected?'active':''}" data-student="${s.studentId}">${s.number}. ${safeHtml(s.name)} <span class="subtle">보낸 ${sent} · 받은 ${received}</span></button>`;
     }).join('');
-    $$('#studentList .student-btn').forEach(btn => btn.addEventListener('click', e => {state.selectedStudentId = e.currentTarget.dataset.student; renderStudentResponses(analyze(state.currentRound));}));
+    $$('#studentList .student-btn').forEach(btn => btn.addEventListener('click', e => {
+      state.selectedStudentId = e.currentTarget.dataset.student;
+      state.selectedStudentView = 'sent';
+      renderStudentResponses(analyze(state.currentRound));
+    }));
     const student = data.byId[selected];
     if(!student){ $('#studentResponseDetail').innerHTML='<div class="empty">학생을 선택하세요.</div>'; return; }
-    const sections = Object.entries(QUESTIONS).map(([qid,q]) => {
-      const rs = data.responses.filter(r=>r.respondentId===selected && r.questionId===qid);
+    const sentCount = data.responses.filter(r=>r.respondentId===selected).length;
+    const receivedCount = data.responses.filter(r=>r.targetId===selected).length;
+    const posReceived = data.responses.filter(r=>r.targetId===selected && r.relationType==='positive').length;
+    const negReceived = data.responses.filter(r=>r.targetId===selected && r.relationType==='negative').length;
+    const view = state.selectedStudentView || 'sent';
+    const content = view === 'received' ? renderReceivedByStudent(selected, data) : renderSentByStudent(selected, data);
+    $('#studentResponseDetail').innerHTML = `
+      <h3>${student.number}. ${safeHtml(student.name)}</h3>
+      <div class="summary-strip">
+        <div class="mini"><strong>${sentCount}</strong><span class="subtle">응답한 관계</span></div>
+        <div class="mini"><strong>${posReceived}</strong><span class="subtle">긍정 지목받음</span></div>
+        <div class="mini"><strong>${negReceived}</strong><span class="subtle">불편감 지목받음</span></div>
+      </div>
+      <div class="student-detail-toolbar">
+        <button type="button" class="mode-btn ${view==='sent'?'active':''}" data-view="sent">학생이 응답한 내용</button>
+        <button type="button" class="mode-btn ${view==='received'?'active':''}" data-view="received">학생이 지목받은 내용</button>
+      </div>
+      ${content}`;
+    $$('#studentResponseDetail .mode-btn').forEach(btn => btn.addEventListener('click', e => {
+      state.selectedStudentView = e.currentTarget.dataset.view;
+      renderStudentResponses(analyze(state.currentRound));
+    }));
+  }
+
+  function renderSentByStudent(studentId, data){
+    return Object.entries(QUESTIONS).map(([qid,q]) => {
+      const rs = data.responses.filter(r=>r.respondentId===studentId && r.questionId===qid);
       const items = rs.length ? rs.map(r => {
         const target = data.byId[r.targetId];
-        const reason = r.tags || r.customReason || '이유 선택 없이 저장';
-        return `<li><strong>${target ? target.number+'. '+safeHtml(target.name) : safeHtml(r.targetId)}</strong><br><span class="subtle">이유: ${safeHtml(reason)}</span></li>`;
+        return `<li><strong>${target ? target.number+'. '+safeHtml(target.name) : safeHtml(r.targetId)}</strong><br><span class="subtle">이유: ${safeHtml(getReasonText(r))}</span></li>`;
       }).join('') : '<li class="subtle">선택 없음</li>';
       return `<div class="q-card"><h4>${qid}. ${q.label}</h4><ul>${items}</ul></div>`;
     }).join('');
-    $('#studentResponseDetail').innerHTML = `<h3>${student.number}. ${safeHtml(student.name)} 학생 응답</h3>${sections}`;
+  }
+
+  function renderReceivedByStudent(studentId, data){
+    return Object.entries(QUESTIONS).map(([qid,q]) => {
+      const rs = data.responses.filter(r=>r.targetId===studentId && r.questionId===qid);
+      const items = rs.length ? rs.map(r => {
+        const respondent = data.byId[r.respondentId];
+        const tagClass = r.relationType === 'positive' ? 'pos' : 'neg';
+        const label = r.relationType === 'positive' ? '긍정' : '불편감';
+        return `<li><strong>${respondent ? respondent.number+'. '+safeHtml(respondent.name) : safeHtml(r.respondentId)}</strong><span class="received-tag ${tagClass}">${label}</span><br><span class="subtle">이유: ${safeHtml(getReasonText(r))}</span></li>`;
+      }).join('') : '<li class="subtle">지목받은 응답 없음</li>';
+      return `<div class="q-card"><h4>${qid}. ${q.label}</h4><ul>${items}</ul></div>`;
+    }).join('');
   }
 
   function renderRawTable(data){
@@ -605,6 +729,10 @@
     el.textContent = message;
     el.className = 'status ' + (type || '');
   }
+
+  $('#reasonModalClose').addEventListener('click', closeReasonModal);
+  $('#reasonModal').addEventListener('click', e => { if(e.target.id === 'reasonModal') closeReasonModal(); });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && $('#reasonModal').classList.contains('show')) closeReasonModal(); });
 
   $('#fileInput').addEventListener('change', async (event) => {
     const file = event.target.files[0];
