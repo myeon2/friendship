@@ -705,21 +705,34 @@
       nodes:{shape:'dot', borderWidth:2, shadow:false, font:{size:23}}
     });
 
-    const resetNodes = () => {
+    const resetGraphFocus = () => {
       nodesData.update(nodeItems.map(n => ({
         id:n.id,
         color:n.originalColor,
         borderWidth:2,
-        font:{...n.font, color:'#0f172a'}
+        font:{...n.font, color:'#0f172a', size:23}
+      })));
+      edgesData.update(edgeItems.map(e => ({
+        id:e.id,
+        color:e.color,
+        width:e.width,
+        dashes:e.dashes,
+        font:e.font ? {...e.font} : undefined
       })));
     };
     state.network.on('click', params => {
-      if(!params.nodes || !params.nodes.length){ resetNodes(); return; }
+      if(!params.nodes || !params.nodes.length){ resetGraphFocus(); return; }
       const selected = params.nodes[0];
       nodesData.update(nodeItems.map(n => n.id === selected
-        ? {id:n.id, color:n.originalColor, borderWidth:6, font:{...n.font, color:'#0f172a', size:25}}
-        : {id:n.id, color:{background:'#e5e7eb', border:'#cbd5e1'}, borderWidth:1, font:{...n.font, color:'#64748b', size:21}}
+        ? {id:n.id, color:{background:n.originalColor.background, border:'#0f172a'}, borderWidth:6, font:{...n.font, color:'#0f172a', size:25}}
+        : {id:n.id, color:n.originalColor, borderWidth:2, font:{...n.font, color:'#0f172a', size:23}}
       ));
+      edgesData.update(edgeItems.map(e => {
+        const related = e.from === selected || e.to === selected;
+        return related
+          ? {id:e.id, color:e.color, width:(e.width || 2) + 1.2, dashes:e.dashes, font:e.font ? {...e.font, color:'#0f172a'} : undefined}
+          : {id:e.id, color:{color:'#cbd5e1'}, width:1, dashes:e.dashes, font:e.font ? {...e.font, color:'#94a3b8'} : undefined};
+      }));
     });
   }
 
