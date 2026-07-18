@@ -306,6 +306,27 @@
     return ['직접쓰기','직접입력','기타','customreason','custom','other'].some(x => k.includes(x));
   }
 
+  function isDirectWriteMarkerValue(value){
+    const k = normHeader(value);
+    if(!k) return false;
+    const markers = ['직접쓰기','직접입력','직접작성','기타','customreason','custom','other'];
+    return markers.some(m => k === m || (k.startsWith(m) && k.length <= m.length + 4));
+  }
+
+  function containsDirectWriteMarker(value){
+    return splitTags(value).some(isDirectWriteMarkerValue) || isDirectWriteMarkerValue(value);
+  }
+
+  function cleanDirectWriteMarker(value){
+    const raw = norm(value);
+    if(!raw) return '';
+    const parts = splitTags(raw);
+    if(parts.length > 1){
+      return parts.filter(x => !isDirectWriteMarkerValue(x)).join(', ');
+    }
+    return isDirectWriteMarkerValue(raw) ? '' : raw;
+  }
+
   function parseDirectWriteItems(value, students){
     const text = norm(value);
     if(!text) return [];
@@ -411,26 +432,61 @@
       const respondentId = resolveStudent(respondentRaw);
       const timestamp = norm(getVal(r, ['타임스탬프','timestamp','time','제출시각','응답시각','일시','날짜']));
       if(!respondentId){ skipped++; return; }
+
+      // Google 설문형 원자료에서는 학생별 선택 칸에 '직접 쓰기'라는 선택지만 들어가고,
+      // 실제 자유응답은 같은 문항의 [직접 쓰기] 열에 '학생명: 구체적 이유' 형태로 저장될 수 있다.
+      // 먼저 자유응답 열을 문항·대상학생별로 모아 둔 뒤, 학생별 선택 칸을 읽을 때 연결한다.
+      const customByQuestionTarget = {};
       Object.keys(r).forEach(header => {
         const qid = extractQuestionFromHeader(header);
         if(!qid) return;
         const targetName = extractTargetFromHeader(header);
+        if(!isDirectWriteTarget(targetName)) return;
         const value = norm(r[header]);
         if(!value) return;
-        const relationType = QUESTIONS[qid]?.type || canonRelation('', qid);
-        if(isDirectWriteTarget(targetName)){
-          const customItems = parseDirectWriteItems(value, students);
-          if(!customItems.length){ skipped++; return; }
-          customItems.forEach(item => {
-            if(item.targetId && item.targetId !== respondentId){
-              responses.push({responseId:'RAW'+String(rowIdx+1).padStart(3,'0')+'_'+qid+'_'+item.targetId+'_C', roundId, respondentId, questionId:qid, targetId:item.targetId, relationType, tags:'', customReason:item.reason, timestamp, source:'raw'});
-            }else skipped++;
-          });
-          return;
-        }
+        const items = parseDirectWriteItems(value, students);
+        if(!customByQuestionTarget[qid]) customByQuestionTarget[qid] = {};
+        items.forEach(item => {
+          if(item.targetId && item.reason){
+            customByQuestionTarget[qid][item.targetId] = item.reason;
+          }
+        });
+      });
+
+      const usedCustom = new Set();
+      Object.keys(r).forEach(header => {
+        const qid = extractQuestionFromHeader(header);
+        if(!qid) return;
+        const targetName = extractTargetFromHeader(header);
+        if(isDirectWriteTarget(targetName)) return;
+        const value = norm(r[header]);
+        if(!value) return;
         const targetId = resolveStudent(targetName);
         if(!targetId || targetId === respondentId){ skipped++; return; }
-        responses.push({responseId:'RAW'+String(rowIdx+1).padStart(3,'0')+'_'+qid+'_'+targetId, roundId, respondentId, questionId:qid, targetId, relationType, tags:value, customReason:'', timestamp, source:'raw'});
+        const relationType = QUESTIONS[qid]?.type || canonRelation('', qid);
+        const directWriteSelected = containsDirectWriteMarker(value);
+        const cleanedTags = cleanDirectWriteMarker(value);
+        const customReason = directWriteSelected ? norm(customByQuestionTarget[qid]?.[targetId] || '') : '';
+        if(directWriteSelected) usedCustom.add(qid + '::' + targetId);
+        responses.push({
+          responseId:'RAW'+String(rowIdx+1).padStart(3,'0')+'_'+qid+'_'+targetId,
+          roundId, respondentId, questionId:qid, targetId, relationType,
+          tags: cleanedTags,
+          customReason: directWriteSelected ? (customReason || '이유 미입력') : '',
+          timestamp, source:'raw'
+        });
+      });
+
+      // 혹시 학생별 선택 칸 없이 [직접 쓰기] 열에만 '학생명: 사유'가 들어온 양식도 누락하지 않는다.
+      Object.entries(customByQuestionTarget).forEach(([qid, byTarget]) => {
+        const relationType = QUESTIONS[qid]?.type || canonRelation('', qid);
+        Object.entries(byTarget).forEach(([targetId, reason]) => {
+          const key = qid + '::' + targetId;
+          if(usedCustom.has(key)) return;
+          if(targetId && targetId !== respondentId){
+            responses.push({responseId:'RAW'+String(rowIdx+1).padStart(3,'0')+'_'+qid+'_'+targetId+'_C', roundId, respondentId, questionId:qid, targetId, relationType, tags:'', customReason:reason, timestamp, source:'raw'});
+          }else skipped++;
+        });
       });
     });
     return {responses, skipped};
@@ -473,7 +529,7 @@
 
   function reasonToKeywords(text){
     const v = norm(text);
-    if(!v || v.includes('이유 선택') || v.includes('넘어가기')) return [];
+    if(!v || isDirectWriteMarkerValue(v) || v.includes('이유 선택') || v.includes('넘어가기')) return [];
     const rules = [
       ['관심사', ['관심사','게임','취미']],
       ['편안함', ['마음이 편','성격이 잘 맞','편해서']],
@@ -506,7 +562,7 @@
   }
 
   function getReasonText(r){
-    const reason = [r.tags, r.customReason].map(norm).filter(Boolean).join(' / ');
+    const reason = [cleanDirectWriteMarker(r.tags), cleanDirectWriteMarker(r.customReason)].map(norm).filter(Boolean).join(' / ');
     return reason || '이유 선택 없이 저장';
   }
 
@@ -820,16 +876,30 @@
     if(!window.vis){ container.innerHTML = '<div class="empty">네트워크 라이브러리를 불러오지 못했습니다. 인터넷 연결 또는 CDN 차단 여부를 확인해 주세요.</div>'; return; }
     if(state.network){ state.network.destroy(); state.network = null; }
 
+    const visibleForSizing = state.overallView
+      ? data.responses
+      : data.responses.filter(r => state.filters[r.questionId]);
+    const sizeStats = Object.fromEntries(data.students.map(s => [s.studentId, {total:0, pos:0, neg:0}]));
+    visibleForSizing.forEach(r => {
+      if(!sizeStats[r.targetId]) return;
+      sizeStats[r.targetId].total++;
+      if(r.relationType === 'positive') sizeStats[r.targetId].pos++;
+      else sizeStats[r.targetId].neg++;
+    });
+    const selectedQuestionNames = state.overallView
+      ? '전체보기'
+      : Object.entries(state.filters).filter(([,checked]) => checked).map(([qid]) => QUESTIONS[qid]?.short || qid).join(', ') || '선택 없음';
+
     const nodeItems = data.students.map(s => {
       const st = data.stats[s.studentId];
+      const focused = sizeStats[s.studentId] || {total:0, pos:0, neg:0};
       const isMale = s.gender.includes('남');
-      const totalIn = st.totalIn || 0;
       const baseColor = {background:isMale?'#86efac':'#fde68a', border:isMale?'#16a34a':'#ca8a04'};
       return {
         id:s.studentId,
         label:`${s.name}`,
-        title:`${s.number}. ${s.name}\n긍정 받은 수: ${st.posIn}\n불편감 받은 수: ${st.negIn}`,
-        size:24 + Math.min(46, totalIn * 3.4),
+        title:`${s.number}. ${s.name}\n현재 보기: ${selectedQuestionNames}\n현재 보기에서 받은 수: ${focused.total}\n긍정 받은 수: ${focused.pos}\n불편감 받은 수: ${focused.neg}\n전체 받은 수: ${st.totalIn}`,
+        size:24 + Math.min(46, focused.total * 5.2),
         color:baseColor,
         originalColor:baseColor,
         borderWidth:2,
