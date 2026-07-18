@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>교우관계분석기</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vis-network@9.1.9/dist/vis-network.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.9/dist/vis-network.min.js"></script>
+  <style>
+    :root{
+      --bg:#f4f7fb; --card:#ffffff; --text:#1f2937; --muted:#64748b; --line:#dbe4f0;
+      --primary:#2563eb; --primary-soft:#dbeafe; --danger:#ef4444; --positive:#2563eb; --negative:#ef4444;
+      --male:#22c55e; --female:#facc15; --warn:#f97316; --soft-red:#fee2e2; --soft-blue:#dbeafe; --soft-green:#dcfce7;
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"Pretendard",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+    .wrap{max-width:1440px;margin:0 auto;padding:24px}
+    .hero{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;background:linear-gradient(135deg,#ffffff,#eef5ff);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:0 10px 30px rgba(15,23,42,.06)}
+    .hero h1{margin:0 0 8px;font-size:30px;letter-spacing:-.04em;font-weight:900}.hero p{margin:0;color:var(--muted);font-size:15px}
+    .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;background:var(--primary-soft);color:#1d4ed8;font-size:13px;font-weight:800;white-space:nowrap}
+    .upload-card{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:0 8px 24px rgba(15,23,42,.05)}
+    .upload-grid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(300px,.9fr);gap:18px;align-items:stretch}.upload-box{border:2px dashed #bfdbfe;border-radius:20px;background:#f8fbff;padding:18px}.upload-box input{width:100%;border:1px solid var(--line);border-radius:14px;padding:12px;background:white;font-size:15px}.survey-panel{border:1px solid var(--line);border-radius:20px;background:linear-gradient(135deg,#ffffff,#f8fbff);padding:18px;height:100%}.survey-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}.primary-link,.soft-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;padding:10px 14px;font-size:14px;font-weight:900;text-decoration:none;border:1px solid var(--line);cursor:pointer}.primary-link{background:var(--primary);color:white;border-color:var(--primary)}.soft-btn{background:#fff;color:var(--primary)}.link-editor{display:none;margin-top:12px;gap:8px}.link-editor.show{display:flex}.link-editor input{flex:1;min-width:180px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px}.guide-list{margin:0;padding-left:20px;color:var(--muted);font-size:14px}.guide-list strong{color:var(--text)}
+    .status{margin-top:12px;border-radius:12px;padding:12px 14px;background:#f8fafc;border:1px solid var(--line);color:var(--muted);font-size:14px;white-space:pre-line}.status.ok{background:#ecfdf5;border-color:#bbf7d0;color:#166534}.status.err{background:#fef2f2;border-color:#fecaca;color:#991b1b}.status.warn{background:#fffbeb;border-color:#fed7aa;color:#92400e}
+    .dashboard{display:none;margin-top:18px}.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}.round-control{display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--line);border-radius:14px;padding:10px 12px}.round-control label{font-weight:700}.round-control select{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:15px;background:white}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab-btn{border:1px solid var(--line);background:#fff;color:var(--muted);padding:10px 14px;border-radius:999px;font-weight:700;cursor:pointer}.tab-btn.active{background:var(--primary);border-color:var(--primary);color:white}.panel{display:none}.panel.active{display:block}
+    .metrics{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:12px;margin-bottom:14px}.metric{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(15,23,42,.04)}.metric .label{font-size:13px;color:var(--muted);font-weight:700}.metric .value{margin-top:5px;font-size:28px;font-weight:800;letter-spacing:-.03em}.metric .hint{font-size:12px;color:var(--muted);margin-top:2px}
+    .main-grid{display:grid;grid-template-columns:minmax(600px,1.45fr) minmax(340px,.85fr);gap:14px}.card{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 8px 24px rgba(15,23,42,.04)}.card h2{margin:0 0 12px;font-size:18px;letter-spacing:-.02em}.card h3{margin:0 0 10px;font-size:15px}.subtle{color:var(--muted);font-size:13px}.network-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.filter-chip{display:inline-flex;gap:6px;align-items:center;background:#f8fafc;border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:13px}.filter-chip input{margin:0}#network{width:100%;height:620px;border:1px solid var(--line);border-radius:16px;background:#fbfdff}.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}.legend span{display:inline-flex;align-items:center;gap:6px}.dot{width:12px;height:12px;border-radius:50%;display:inline-block}.line-sample{width:24px;height:3px;border-radius:99px;display:inline-block}.stack{display:grid;gap:14px}.signal-list{display:grid;gap:8px}.student-pill{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);background:#f8fafc;border-radius:14px;padding:10px 12px}.student-pill strong{font-weight:800}.student-pill small{color:var(--muted)}.wordcloud{min-height:145px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;padding:10px;background:#f8fafc;border-radius:16px}.word{font-weight:800;color:#1d4ed8}.callout{background:#eef6ff;border:1px solid #bfdbfe;border-radius:14px;padding:12px;margin-bottom:12px;color:#1e3a8a;font-weight:700}
+    .relationship-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.rel-box{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}.rel-box.green{background:#f0fdf4}.rel-box.blue{background:#eff6ff}.rel-box.red{background:#fef2f2}.rel-box ul{margin:0;padding-left:18px}.rel-box li{margin:6px 0}.scroll{overflow:auto;border:1px solid var(--line);border-radius:16px;background:white}.matrix-table{border-collapse:collapse;min-width:920px;width:100%;font-size:13px}.matrix-table th,.matrix-table td{border:1px solid #e2e8f0;padding:8px;vertical-align:middle}.matrix-table th{background:#f8fafc;position:sticky;top:0;z-index:1;white-space:nowrap}.matrix-table th:first-child{position:sticky;left:0;z-index:2}.matrix-table td:first-child{position:sticky;left:0;background:#f8fafc;font-weight:800;white-space:nowrap;text-align:left}.matrix-table td:not(:first-child){text-align:center}.chip{display:inline-block;margin:1px 2px 1px 0;border-radius:999px;padding:2px 7px;font-size:12px;font-weight:700}.chip.pos{background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe}.chip.neg{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}.response-grid{display:grid;grid-template-columns:300px 1fr;gap:14px}.student-list{max-height:620px;overflow:auto}.student-btn{width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer}.student-btn.active{background:var(--primary-soft);border-color:#93c5fd;color:#1d4ed8;font-weight:800}.q-card{border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;background:linear-gradient(180deg,#fff,#fbfdff)}.q-card h4{margin:0 0 10px;display:flex;align-items:center;gap:8px}.q-label{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;background:var(--primary-soft);color:#1d4ed8;font-size:13px;font-weight:900}.q-card.neg .q-label{background:#fee2e2;color:#991b1b}.q-card.pos{border-left:5px solid var(--positive)}.q-card.neg{border-left:5px solid var(--negative);background:linear-gradient(180deg,#fff,#fffafa)}.q-card ul{margin:0;padding:0;list-style:none}.response-line{display:flex;align-items:flex-start;gap:8px;justify-content:space-between;border-top:1px dashed #e2e8f0;padding:8px 0}.response-line:first-child{border-top:0}.response-line strong{white-space:nowrap}.response-line.pos strong{color:#1d4ed8}.response-line.neg strong{color:#991b1b}.response-reason{color:var(--muted);text-align:right}.response-line.pos .response-reason{color:#1e40af}.response-line.neg .response-reason{color:#991b1b}.received-summary{border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,#f8fafc,#ffffff);padding:14px;margin-bottom:14px}.summary-columns{display:grid;grid-template-columns:1fr 1fr;gap:10px}.summary-box{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px}.summary-box.pos{border-color:#bfdbfe;background:#eff6ff}.summary-box.neg{border-color:#fecaca;background:#fff7f7}.summary-box h4{margin:0 0 8px;font-size:14px}.summary-box.pos h4{color:#1d4ed8}.summary-box.neg h4{color:#991b1b}.keyword-chip{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;margin:3px;font-size:12px;font-weight:800}.keyword-chip.pos{background:#dbeafe;color:#1e40af}.keyword-chip.neg{background:#fee2e2;color:#991b1b}.raw-toggle{border:1px solid var(--line);border-radius:16px;background:white;margin-top:14px;overflow:hidden}.raw-toggle summary{cursor:pointer;padding:16px 18px;font-weight:900}.raw-toggle summary::marker{color:var(--primary)}.raw-toggle .scroll{border-left:0;border-right:0;border-bottom:0;border-radius:0}.raw-table{border-collapse:collapse;width:100%;font-size:13px}.raw-table th,.raw-table td{border:1px solid #e2e8f0;padding:8px;text-align:left}.raw-table th{background:#f8fafc}.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px;background:#f8fafc}.footer-note{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
+
+    .dashboard .card{transition:box-shadow .2s ease, transform .2s ease}.section-note{margin:-4px 0 12px;color:var(--muted);font-size:13px}.signal-section{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fbfdff}.signal-section + .signal-section{margin-top:12px}.signal-section.low{background:#f8fbff}.signal-section.warn{background:#fff7f7}.signal-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.signal-heading strong{font-size:14px}.student-pill{box-shadow:0 2px 8px rgba(15,23,42,.03)}.student-pill.warn{border-color:#fecaca;background:#fff7f7}.student-pill.low{border-color:#bfdbfe;background:#f8fbff}.wordcloud{min-height:180px;gap:10px 14px;padding:18px;background:linear-gradient(135deg,#f8fafc,#eef6ff)}.word{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-weight:900;color:#1d4ed8;background:rgba(219,234,254,.5);line-height:1.1}.word small{font-size:11px;color:#64748b;margin-left:4px;font-weight:700}.chip{border:0;cursor:pointer;font-family:inherit}.chip:hover{filter:brightness(.96);transform:translateY(-1px)}.matrix-table td{min-width:74px}.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal-backdrop.show{display:flex}.modal{width:min(620px,100%);background:white;border-radius:22px;border:1px solid var(--line);box-shadow:0 24px 80px rgba(15,23,42,.25);padding:20px}.modal h3{margin:0 0 8px;font-size:18px}.modal-body{border:1px solid var(--line);border-radius:16px;background:#f8fafc;padding:14px;margin-top:12px}.modal-close{border:1px solid var(--line);background:white;border-radius:10px;padding:8px 12px;cursor:pointer;font-weight:700}.student-detail-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}.mode-btn{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:8px 12px;font-weight:800;cursor:pointer}.mode-btn.active{background:var(--primary);border-color:var(--primary);color:white}.summary-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 14px}.summary-strip .mini{border:1px solid var(--line);border-radius:14px;background:#f8fafc;padding:10px;text-align:center}.summary-strip .mini strong{display:block;font-size:18px}.received-tag{display:inline-flex;border-radius:999px;padding:2px 7px;margin-left:4px;font-size:12px;font-weight:700}.received-tag.pos{background:#dbeafe;color:#1e40af}.received-tag.neg{background:#fee2e2;color:#991b1b}
+    @media (max-width:1100px){.upload-grid,.main-grid,.response-grid,.summary-columns{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}#network{height:520px}.relationship-grid{grid-template-columns:1fr}}@media (max-width:640px){.wrap{padding:14px}.hero{display:block}.metrics{grid-template-columns:1fr}.card{padding:14px}.tab-btn{font-size:13px;padding:8px 10px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <h1>교우관계분석기</h1>
+        <p>학생 설문 결과 Excel 파일을 업로드하면 소시오그램, 관계 매트릭스, 관계 유형, 학생별 응답을 브라우저에서 바로 분석합니다.</p>
+      </div>
+      <span class="badge">📁 HTML + Excel 업로드형</span>
+    </section>
+
+    <section class="upload-card" id="uploadSection">
+      <div class="upload-grid">
+        <div class="upload-box">
+          <h2 style="margin:0 0 10px;font-size:18px">1. 설문 결과 Excel 업로드</h2>
+          <input id="fileInput" type="file" accept=".xlsx,.xls" />
+          <div id="loadStatus" class="status">파일을 선택하면 이 브라우저 안에서만 분석합니다. 서버로 업로드하지 않습니다.</div>
+        </div>
+        <div class="survey-panel">
+          <h2 style="margin:0 0 10px;font-size:18px">설문 링크</h2>
+          <p class="subtle" style="margin:0">학생 설문을 진행한 뒤, 응답 결과 Excel 파일을 내려받아 왼쪽에 업로드하세요.</p>
+          <div class="survey-actions">
+            <a id="surveyLink" class="primary-link" href="https://script.google.com/a/macros/gsn.es.kr/s/AKfycbzJiRfTnk2j2bsclZ7JJwNzQChzh0YG9Drdk6kLfL89KfEjyZXgCw80z6QjqaZ1DLclAw/exec" target="_blank" rel="noopener">설문 링크 바로가기</a>
+            <button type="button" class="soft-btn" id="editSurveyLinkBtn">링크 바꾸기</button>
+          </div>
+          <div class="link-editor" id="linkEditor">
+            <input id="surveyLinkInput" type="url" value="https://script.google.com/a/macros/gsn.es.kr/s/AKfycbzJiRfTnk2j2bsclZ7JJwNzQChzh0YG9Drdk6kLfL89KfEjyZXgCw80z6QjqaZ1DLclAw/exec" aria-label="설문 링크 주소" />
+            <button type="button" class="soft-btn" id="saveSurveyLinkBtn">적용</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard" id="dashboard">
+      <div class="topbar">
+        <div class="round-control">
+          <label for="roundSelect">검사 회차</label>
+          <select id="roundSelect"></select>
+          <span class="subtle" id="dataSummary"></span>
+        </div>
+        <nav class="tabs" aria-label="대시보드 탭">
+          <button type="button" class="tab-btn active" data-tab="tabDashboard">학급 전체 대시보드</button>
+          <button type="button" class="tab-btn" data-tab="tabMatrix">N × N 관계 매트릭스</button>
+          <button type="button" class="tab-btn" data-tab="tabRelations">관계 유형 요약</button>
+          <button type="button" class="tab-btn" data-tab="tabResponses">학생별 응답 확인</button>
+        </nav>
+      </div>
+
+      <div class="panel active" id="tabDashboard">
+        <div class="metrics" id="metrics"></div>
+        <div class="main-grid">
+          <div class="card">
+            <h2>학급 전체 소시오그램</h2>
+            <div class="network-tools" id="filters"></div>
+            <div id="network"></div>
+            <div class="legend">
+              <span><i class="line-sample" style="background:var(--positive)"></i>긍정 관계</span>
+              <span><i class="line-sample" style="background:var(--negative)"></i>불편감 관계</span>
+              <span><i class="dot" style="background:var(--male)"></i>남학생</span>
+              <span><i class="dot" style="background:var(--female)"></i>여학생</span>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="card">
+              <h2>관찰 필요 신호</h2>
+              <p class="section-note">받은 지목 수와 불편감 지목 수를 바탕으로 추가 관찰이 필요한 지점을 보여줍니다.</p>
+              <div class="signal-section low">
+                <div class="signal-heading"><strong>관계 관찰 필요</strong><span class="subtle">받은 지목이 적음</span></div>
+                <div class="signal-list" id="lowSignal"></div>
+              </div>
+              <div class="signal-section warn">
+                <div class="signal-heading"><strong>불편감 집중 신호</strong><span class="subtle">Q6 지목 집중</span></div>
+                <div class="signal-list" id="discomfortSignal"></div>
+              </div>
+            </div>
+            <div class="card">
+              <h2>학급의 강점 키워드</h2>
+              <div class="callout" id="wordSummary">긍정 이유 태그를 분석합니다.</div>
+              <div class="wordcloud" id="wordcloud"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="tabMatrix">
+        <div class="card">
+          <h2>N × N 관계 매트릭스</h2>
+          <p class="subtle">행은 응답한 학생, 열은 지목받은 학생입니다. 셀에는 해당 학생이 선택한 문항이 표시됩니다.</p>
+          <div class="scroll" id="matrixWrap"></div>
+        </div>
+      </div>
+
+      <div class="panel" id="tabRelations">
+        <div class="relationship-grid" id="relationshipGrid"></div>
+      </div>
+
+      <div class="panel" id="tabResponses">
+        <div class="response-grid">
+          <div class="card">
+            <h2>학생 선택</h2>
+            <div class="student-list" id="studentList"></div>
+          </div>
+          <div class="card">
+            <h2>학생별 응답 내용</h2>
+            <div id="studentResponseDetail" class="empty">왼쪽에서 학생을 선택하세요.</div>
+          </div>
+        </div>
+        <details class="raw-toggle">
+          <summary>전체 응답 원본 표 열기</summary>
+          <div class="scroll" id="rawTableWrap"></div>
+        </details>
+      </div>
+
+      <div class="modal-backdrop" id="reasonModal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reasonModalTitle">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+            <div>
+              <h3 id="reasonModalTitle">응답 사유</h3>
+              <p class="subtle" id="reasonModalMeta"></p>
+            </div>
+            <button type="button" class="modal-close" id="reasonModalClose">닫기</button>
+          </div>
+          <div class="modal-body" id="reasonModalBody"></div>
+        </div>
+      </div>
+      <p class="footer-note">분석 결과는 학생을 단정하기 위한 자료가 아니라, 교사의 생활지도와 상담을 돕기 위한 참고 자료입니다.</p>
+    </section>
+  </div>
+
+<script>
+(function(){
+  const QUESTIONS = {
+    Q1:{short:'놀이', label:'놀이·여가', type:'positive'},
+    Q2:{short:'과제', label:'과제·협력', type:'positive'},
+    Q3:{short:'정서', label:'정서·근접성', type:'positive'},
+    Q4:{short:'친사회', label:'친사회적 평판', type:'positive'},
+    Q5:{short:'리더십', label:'사회적 영향력', type:'positive'},
+    Q6:{short:'불편감', label:'불편감 응답 관계', type:'negative'}
+  };
+  const state = {students:[], responses:[], rounds:[], currentRound:'', network:null, overallView:true, filters:{Q1:true,Q2:true,Q3:true,Q4:true,Q5:true,Q6:true}, selectedStudentId:null, selectedStudentView:'sent', matrixDetails:{}};
+
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  function norm(s){return String(s ?? '').trim();}
+  function normHeader(s){return norm(s).toLowerCase().replace(/[\s_\-\.()\[\]{}·\/]/g,'');}
+  function isTrue(v){const s=norm(v).toLowerCase(); return v===true || s==='' || ['true','y','yes','1','활성','사용','o'].includes(s);}
+  function getVal(row, aliases){
+    const wanted = aliases.map(normHeader);
+    for(const k of Object.keys(row)){ if(wanted.includes(normHeader(k))) return row[k]; }
+    return '';
+  }
+  function findSheet(workbook, names){
+    const normalized = workbook.SheetNames.map(n => ({name:n, key:normHeader(n)}));
+    const wants = names.map(normHeader);
+    const exact = normalized.find(s => wants.includes(s.key));
+    if(exact) return workbook.Sheets[exact.name];
+    const contains = normalized.find(s => wants.some(w => s.key.includes(w) || w.includes(s.key)));
+    return contains ? workbook.Sheets[contains.name] : null;
+  }
+  function readRows(sheet){ return XLSX.utils.sheet_to_json(sheet, {defval:'', raw:false}); }
+  function padId(n){ const num=parseInt(n,10); return Number.isFinite(num) ? 'S'+String(num).padStart(3,'0') : ''; }
+  function canonQuestion(v){
+    const s = norm(v).toUpperCase();
+    const m = s.match(/Q\s*([1-6])/i) || s.match(/^([1-6])$/);
+    if(m) return 'Q'+m[1];
+    const k = norm(v);
+    if(k.includes('놀이') || k.includes('쉬는') || k.includes('점심')) return 'Q1';
+    if(k.includes('과제') || k.includes('모둠')) return 'Q2';
+    if(k.includes('정서') || k.includes('짝꿍') || k.includes('옆자리')) return 'Q3';
+    if(k.includes('친사회') || k.includes('도와') || k.includes('양보')) return 'Q4';
+    if(k.includes('사회적') || k.includes('리더') || k.includes('반장') || k.includes('임원')) return 'Q5';
+    if(k.includes('불편') || k.includes('기피') || k.includes('갈등')) return 'Q6';
+    return '';
+  }
+  function canonRelation(v, qid){
+    const s=norm(v).toLowerCase();
+    if(['negative','neg','부정','불편','기피','갈등','discomfort'].some(x => s.includes(x))) return 'negative';
+    if(['positive','pos','긍정','선호','호감'].some(x => s.includes(x))) return 'positive';
+    return QUESTIONS[qid]?.type || 'positive';
+  }
+  function splitTags(s){
+    return norm(s).split(/[,;|\n]+/).map(x=>x.trim()).filter(Boolean);
+  }
+  function safeHtml(s){
+    return norm(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  }
+
+  function hasAnyHeader(sheet, aliases){
+    if(!sheet || !sheet['!ref']) return false;
+    const rows = XLSX.utils.sheet_to_json(sheet, {header:1, defval:'', raw:false, blankrows:false});
+    const header = rows[0] || [];
+    const keys = header.map(normHeader);
+    return aliases.some(a => keys.includes(normHeader(a)));
+  }
+
+  function sheetRowsByName(workbook, sheetName){
+    return readRows(workbook.Sheets[sheetName]);
+  }
+
+  function getSheetName(workbook, names){
+    const normalized = workbook.SheetNames.map(n => ({name:n, key:normHeader(n)}));
+    const wants = names.map(normHeader);
+    const exact = normalized.find(s => wants.includes(s.key));
+    if(exact) return exact.name;
+    const contains = normalized.find(s => wants.some(w => s.key.includes(w) || w.includes(s.key)));
+    return contains ? contains.name : '';
+  }
+
+  function extractQuestionFromHeader(header){
+    return canonQuestion(header);
+  }
+
+  function extractTargetFromHeader(header){
+    const h = norm(header);
+    const bracket = h.match(/[\[\(（【]\s*([^\]\)）】]+?)\s*[\]\)）】]/);
+    if(bracket) return norm(bracket[1]);
+    const colon = h.split(/[:：]/).map(x=>x.trim()).filter(Boolean);
+    if(colon.length >= 2) return colon[colon.length-1];
+    const underscore = h.split(/[_]/).map(x=>x.trim()).filter(Boolean);
+    if(underscore.length >= 3) return underscore[underscore.length-1];
+    return '';
+  }
+
+  function isDirectWriteTarget(target){
+    const k = normHeader(target);
+    return ['직접쓰기','직접입력','기타','customreason','custom','other'].some(x => k.includes(x));
+  }
+
+  function parseDirectWriteItems(value, students){
+    const text = norm(value);
+    if(!text) return [];
+    const chunks = text.split(/[\n;|]+/).map(x=>x.trim()).filter(Boolean);
+    const items = [];
+    chunks.forEach(chunk => {
+      let matched = null;
+      const sorted = students.slice().sort((a,b)=>b.name.length-a.name.length);
+      for(const s of sorted){
+        const name = s.name;
+        if(chunk.startsWith(name)){
+          const rest = chunk.slice(name.length).replace(/^[\s:：\-–—]+/, '').trim();
+          if(rest){ matched = {targetId:s.studentId, reason:rest}; break; }
+        }
+        const colonPattern = new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*[:：]\\s*(.+)$');
+        const m = chunk.match(colonPattern);
+        if(m){ matched = {targetId:s.studentId, reason:m[1].trim()}; break; }
+      }
+      if(matched) items.push(matched);
+    });
+    return items;
+  }
+
+  function buildStudentMaps(students){
+    const nameToId = new Map(students.map(s => [s.name, s.studentId]));
+    const idToId = new Map(students.map(s => [s.studentId, s.studentId]));
+    const numberToId = new Map(students.map(s => [String(s.number), s.studentId]));
+    const resolveStudent = (v) => {
+      const x = norm(v);
+      if(!x) return '';
+      if(idToId.has(x)) return x;
+      if(nameToId.has(x)) return nameToId.get(x);
+      if(numberToId.has(x)) return numberToId.get(x);
+      const byNameLoose = students.find(s => normHeader(s.name) === normHeader(x));
+      return byNameLoose ? byNameLoose.studentId : '';
+    };
+    return {nameToId, idToId, numberToId, resolveStudent};
+  }
+
+  function parseStudentsFromSheet(workbook){
+    const studentsName = getSheetName(workbook, ['Students','학생명단','학생','명단']);
+    if(!studentsName) return [];
+    const studentRows = sheetRowsByName(workbook, studentsName);
+    const rawStudents = studentRows.map((r, idx) => {
+      const number = getVal(r, ['number','번호','출석번호','순번']) || idx+1;
+      const name = norm(getVal(r, ['name','이름','학생명','성명']));
+      const gender = norm(getVal(r, ['gender','성별','sex']));
+      const studentId = norm(getVal(r, ['studentId','studentID','id','학생ID','아이디'])) || padId(number) || 'S'+String(idx+1).padStart(3,'0');
+      const activeRaw = getVal(r, ['active','사용','활성','참여','대상']);
+      const active = activeRaw === '' ? true : isTrue(activeRaw);
+      return {studentId, number:Number(number)||idx+1, name, gender, active};
+    }).filter(s => s.name && s.active);
+    rawStudents.sort((a,b)=>a.number-b.number || a.name.localeCompare(b.name,'ko'));
+    return rawStudents;
+  }
+
+  function inferStudentsFromRaw(rawRows){
+    const names = [];
+    const addName = (name) => {
+      name = norm(name);
+      if(!name || isDirectWriteTarget(name)) return;
+      if(!names.includes(name)) names.push(name);
+    };
+    rawRows.forEach(r => {
+      addName(getVal(r, ['응답자','응답 학생','응답학생','학생','학생명','이름','성명','나','respondent','respondentName','name']));
+      Object.keys(r).forEach(h => {
+        const qid = extractQuestionFromHeader(h);
+        if(!qid) return;
+        const target = extractTargetFromHeader(h);
+        addName(target);
+      });
+    });
+    return names.map((name, idx) => ({studentId:'S'+String(idx+1).padStart(3,'0'), number:idx+1, name, gender:'', active:true}));
+  }
+
+  function parseNormalizedResponses(responseRows, students){
+    const {resolveStudent} = buildStudentMaps(students);
+    let skipped = 0;
+    const responses = responseRows.map((r, idx) => {
+      const roundId = norm(getVal(r, ['roundId','round','회차','검사회차'])) || 'R001';
+      const respondentRaw = getVal(r, ['respondentId','respondentName','respondent','응답자','응답학생','학생','학생명','나']);
+      const targetRaw = getVal(r, ['targetId','targetName','target','선택친구','선택 친구','지목학생','지목 친구','친구','대상학생','상대']);
+      const qid = canonQuestion(getVal(r, ['questionId','question','문항','질문','문항ID','문항번호']));
+      const respondentId = resolveStudent(respondentRaw);
+      const targetId = resolveStudent(targetRaw);
+      if(!respondentId || !targetId || !qid || respondentId === targetId){ skipped++; return null; }
+      const relationType = canonRelation(getVal(r, ['relationType','relation','관계','관계유형','구분']), qid);
+      const tags = norm(getVal(r, ['tags','tag','선택이유','선택 이유','이유','reason']));
+      const customReason = norm(getVal(r, ['customReason','직접입력','직접 입력','직접쓰기','직접 쓰기','기타']));
+      const timestamp = norm(getVal(r, ['timestamp','time','타임스탬프','제출시각','응답시각','일시','날짜']));
+      return {responseId:norm(getVal(r, ['responseId','응답ID','id'])) || 'RSP'+String(idx+1).padStart(4,'0'), roundId, respondentId, questionId:qid, targetId, relationType, tags, customReason, timestamp, source:'normalized'};
+    }).filter(Boolean);
+    return {responses, skipped};
+  }
+
+  function parseRawSurveyRows(rawRows, students){
+    const {resolveStudent} = buildStudentMaps(students);
+    let skipped = 0;
+    const responses = [];
+    rawRows.forEach((r, rowIdx) => {
+      const roundId = norm(getVal(r, ['roundId','round','회차','검사회차','검사 회차'])) || 'R001';
+      const respondentRaw = getVal(r, ['응답자','응답 학생','응답학생','학생','학생명','이름','성명','나','respondentId','respondentName','respondent','name']);
+      const respondentId = resolveStudent(respondentRaw);
+      const timestamp = norm(getVal(r, ['타임스탬프','timestamp','time','제출시각','응답시각','일시','날짜']));
+      if(!respondentId){ skipped++; return; }
+      Object.keys(r).forEach(header => {
+        const qid = extractQuestionFromHeader(header);
+        if(!qid) return;
+        const targetName = extractTargetFromHeader(header);
+        const value = norm(r[header]);
+        if(!value) return;
+        const relationType = QUESTIONS[qid]?.type || canonRelation('', qid);
+        if(isDirectWriteTarget(targetName)){
+          const customItems = parseDirectWriteItems(value, students);
+          if(!customItems.length){ skipped++; return; }
+          customItems.forEach(item => {
+            if(item.targetId && item.targetId !== respondentId){
+              responses.push({responseId:'RAW'+String(rowIdx+1).padStart(3,'0')+'_'+qid+'_'+item.targetId+'_C', roundId, respondentId, questionId:qid, targetId:item.targetId, relationType, tags:'', customReason:item.reason, timestamp, source:'raw'});
+            }else skipped++;
+          });
+          return;
+        }
+        const targetId = resolveStudent(targetName);
+        if(!targetId || targetId === respondentId){ skipped++; return; }
+        responses.push({responseId:'RAW'+String(rowIdx+1).padStart(3,'0')+'_'+qid+'_'+targetId, roundId, respondentId, questionId:qid, targetId, relationType, tags:value, customReason:'', timestamp, source:'raw'});
+      });
+    });
+    return {responses, skipped};
+  }
+
+  function parseWorkbook(workbook){
+    let students = parseStudentsFromSheet(workbook);
+
+    const rawSheetName = getSheetName(workbook, ['설문응답_RAW','설문응답RAW','설문응답 raw','설문응답','구글설문응답','GoogleForm','Google Forms','Form Responses 1','Form Responses','설문지 응답 시트1','설문지응답시트1','Raw','RAW']);
+    const normalizedSheetName = getSheetName(workbook, ['NormalizedResponses','Normalized Responses','Responses','응답정리','분석용응답','응답']);
+
+    let sourceType = '';
+    let result = {responses:[], skipped:0};
+
+    if(rawSheetName){
+      const rawRows = sheetRowsByName(workbook, rawSheetName);
+      const hasWideColumns = rawRows.length && Object.keys(rawRows[0]).some(h => extractQuestionFromHeader(h) && extractTargetFromHeader(h));
+      if(hasWideColumns){
+        if(!students.length) students = inferStudentsFromRaw(rawRows);
+        if(!students.length) throw new Error('학생 명단을 읽지 못했습니다. Students 시트를 넣거나 설문응답_RAW에 응답자와 학생명 열이 있는지 확인해 주세요.');
+        result = parseRawSurveyRows(rawRows, students);
+        sourceType = `구글 설문형 원자료(${rawSheetName})`;
+      }
+    }
+
+    if(!result.responses.length && normalizedSheetName){
+      if(!students.length) throw new Error('분석용 응답 시트를 읽으려면 Students 또는 학생명단 시트가 필요합니다.');
+      const responseRows = sheetRowsByName(workbook, normalizedSheetName);
+      result = parseNormalizedResponses(responseRows, students);
+      sourceType = `정규화 응답(${normalizedSheetName})`;
+    }
+
+    if(!students.length) throw new Error('Students 또는 학생명단 시트에서 학생 이름을 읽지 못했습니다.');
+    if(!result.responses.length) throw new Error('유효한 응답을 읽지 못했습니다. 설문응답_RAW 또는 Responses 시트의 열 이름과 값을 확인해 주세요.');
+
+    const rounds = Array.from(new Set(result.responses.map(r=>r.roundId))).sort();
+    return {students, responses:result.responses, rounds, skipped:result.skipped, sourceType};
+  }
+
+
+  function reasonToKeywords(text){
+    const v = norm(text);
+    if(!v || v.includes('이유 선택') || v.includes('넘어가기')) return [];
+    const rules = [
+      ['관심사', ['관심사','게임','취미']],
+      ['편안함', ['마음이 편','성격이 잘 맞','편해서']],
+      ['재미', ['재미','유머']],
+      ['오래 친함', ['예전부터','저학년','오래']],
+      ['존중', ['의견을 잘 들어','존중']],
+      ['책임감', ['책임감','끝까지']],
+      ['친절한 설명', ['친절','가르쳐']],
+      ['아이디어', ['아이디어','이끌어']],
+      ['배려심', ['배려','다정']],
+      ['친해지고 싶음', ['친해지고']],
+      ['차분함', ['조용','차분','집중']],
+      ['위로', ['속상','위로']],
+      ['묵묵한 도움', ['묵묵','궂은일']],
+      ['도움', ['도와','도움','흔쾌히']],
+      ['고운 말', ['고운 말','무시하지']],
+      ['화해 중재', ['화해','다툼']],
+      ['자신감', ['발표','자신감']],
+      ['공평함', ['공평','규칙','모범']],
+      ['의견 조율', ['의견을 잘 모아','결정']],
+      ['밝은 분위기', ['밝','긍정적']]
+    ];
+    const found = [];
+    rules.forEach(([keyword, needles]) => {
+      if(needles.some(n => v.includes(n))) found.push(keyword);
+    });
+    if(found.length) return Array.from(new Set(found));
+    const fallback = shortenWord(v).replace(/[\[\]{}()]/g,'').slice(0,14);
+    return fallback ? [fallback] : [];
+  }
+
+  function getReasonText(r){
+    const reason = [r.tags, r.customReason].map(norm).filter(Boolean).join(' / ');
+    return reason || '이유 선택 없이 저장';
+  }
+
+  function summarizeReasonText(reason, maxLen=34){
+    const raw = norm(reason).replace(/\s+/g, ' ');
+    if(!raw || raw.includes('이유 선택')) return '이유 미선택';
+    const kws = reasonToKeywords(raw);
+    if(kws.length) return kws.slice(0,3).join(' · ');
+    const shortened = shortenWord(raw).replace(/\s+/g, ' ');
+    const out = shortened || raw;
+    return out.length > maxLen ? out.slice(0, maxLen) + '…' : out;
+  }
+
+  function summarizeReasons(responses, relationType){
+    const counts = {};
+    responses.filter(r => !relationType || r.relationType === relationType).forEach(r => {
+      const reason = getReasonText(r);
+      const kws = reasonToKeywords(reason);
+      const keys = kws.length ? kws : [summarizeReasonText(reason, 18)];
+      keys.forEach(k => {
+        if(!k || k === '이유 미선택') return;
+        counts[k] = (counts[k] || 0) + 1;
+      });
+    });
+    return Object.entries(counts).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0], 'ko'));
+  }
+
+  function analyze(roundId){
+    const students = state.students;
+    const byId = Object.fromEntries(students.map(s => [s.studentId, s]));
+    const responses = state.responses.filter(r => r.roundId === roundId);
+    const stats = Object.fromEntries(students.map(s => [s.studentId, {posIn:0, negIn:0, posOut:0, negOut:0, totalIn:0, totalOut:0}]));
+    const submitted = new Set();
+    const tagCounts = {};
+    responses.forEach(r => {
+      submitted.add(r.respondentId);
+      const pos = r.relationType === 'positive';
+      if(pos){ stats[r.targetId].posIn++; stats[r.respondentId].posOut++; }
+      else { stats[r.targetId].negIn++; stats[r.respondentId].negOut++; }
+      stats[r.targetId].totalIn++; stats[r.respondentId].totalOut++;
+      if(pos){
+        reasonToKeywords([r.tags, r.customReason].filter(Boolean).join('\n')).forEach(t => {
+          tagCounts[t] = (tagCounts[t] || 0) + 1;
+        });
+      }
+    });
+    const positive = responses.filter(r=>r.relationType==='positive').length;
+    const negative = responses.filter(r=>r.relationType==='negative').length;
+    const total = positive + negative;
+    const cohesion = total ? Math.round(positive / total * 100) : 0;
+
+    const posAdj = {}, negAdj = {}, pairQs = {};
+    students.forEach(s => {posAdj[s.studentId]=new Set(); negAdj[s.studentId]=new Set();});
+    responses.forEach(r => {
+      const adj = r.relationType === 'positive' ? posAdj : negAdj;
+      adj[r.respondentId].add(r.targetId);
+      const key = r.respondentId + '>' + r.targetId;
+      pairQs[key] = pairQs[key] || [];
+      pairQs[key].push(r.questionId);
+    });
+    const pairLabel = (a,b) => Array.from(new Set(pairQs[a+'>'+b] || [])).map(q=>QUESTIONS[q]?.short || q).join(', ');
+    const mutualPositive = [];
+    const mutualNegative = [];
+    const asymmetric = [];
+    for(const a of students){
+      for(const b of students){
+        if(a.studentId >= b.studentId) continue;
+        const aPosB = posAdj[a.studentId].has(b.studentId), bPosA = posAdj[b.studentId].has(a.studentId);
+        const aNegB = negAdj[a.studentId].has(b.studentId), bNegA = negAdj[b.studentId].has(a.studentId);
+        if(aPosB && bPosA) mutualPositive.push(`${a.name} ↔ ${b.name} (${pairLabel(a.studentId,b.studentId)} / ${pairLabel(b.studentId,a.studentId)})`);
+        if(aNegB && bNegA) mutualNegative.push(`${a.name} ↔ ${b.name} (${pairLabel(a.studentId,b.studentId)} / ${pairLabel(b.studentId,a.studentId)})`);
+      }
+    }
+    const asymSet = new Set();
+    responses.filter(r => r.relationType === 'negative').forEach(r => {
+      if(negAdj[r.targetId]?.has(r.respondentId)) return;
+      const key = 'neg:' + r.respondentId + '>' + r.targetId;
+      if(asymSet.has(key)) return;
+      asymSet.add(key);
+      const reasonSummary = summarizeReasonText(getReasonText(r));
+      asymmetric.push(`${byId[r.respondentId].name} → ${byId[r.targetId].name} (불편감 이유: ${reasonSummary})`);
+    });
+    responses.filter(r => r.relationType === 'positive').forEach(r => {
+      if(posAdj[r.targetId]?.has(r.respondentId)) return;
+      const reverseNeg = negAdj[r.targetId]?.has(r.respondentId);
+      const targetResponded = responses.some(x => x.respondentId === r.targetId);
+      const suffix = reverseNeg ? '상대는 불편감 응답' : (targetResponded ? '상대의 상호 지목 없음' : '상대 응답 없음');
+      const key = 'pos:' + r.respondentId + '>' + r.targetId + ':' + r.questionId;
+      if(asymSet.has(key)) return;
+      asymSet.add(key);
+      asymmetric.push(`${byId[r.respondentId].name} → ${byId[r.targetId].name} (${QUESTIONS[r.questionId].short}, ${suffix})`);
+    });
+
+    const low = students.map(s => ({...s, ...stats[s.studentId]})).sort((a,b)=>a.totalIn-b.totalIn || a.posIn-b.posIn).slice(0,3);
+    const discomfort = students.map(s => ({...s, ...stats[s.studentId]})).filter(s=>s.negIn>0).sort((a,b)=>b.negIn-a.negIn || a.posIn-b.posIn).slice(0,3);
+    return {students, byId, responses, stats, submitted, positive, negative, total, cohesion, tagCounts, mutualPositive, mutualNegative, asymmetric, low, discomfort};
+  }
+
+  function renderAll(){
+    const roundId = $('#roundSelect').value;
+    state.currentRound = roundId;
+    const data = analyze(roundId);
+    renderMetrics(data);
+    renderFilters();
+    renderNetwork(data);
+    renderSignals(data);
+    renderWordcloud(data);
+    renderMatrix(data);
+    renderRelationships(data);
+    renderStudentResponses(data);
+    renderRawTable(data);
+    $('#dataSummary').textContent = `학생 ${state.students.length}명 · 응답 ${data.responses.length}건`;
+  }
+
+  function renderMetrics(data){
+    const rate = state.students.length ? Math.round(data.submitted.size / state.students.length * 100) : 0;
+    $('#metrics').innerHTML = [
+      ['응답률', rate+'%', `${data.submitted.size}/${state.students.length}명 제출`],
+      ['긍정 지목', data.positive, 'Q1~Q5 전체 지목 수'],
+      ['불편감 지목', data.negative, 'Q6 지목 수'],
+      ['학급 응집력', data.cohesion+'%', '긍정 / 전체 지목 비율']
+    ].map(m => `<div class="metric"><div class="label">${m[0]}</div><div class="value">${m[1]}</div><div class="hint">${m[2]}</div></div>`).join('');
+  }
+
+  function renderFilters(){
+    const individual = Object.entries(QUESTIONS).map(([qid,q]) => `
+      <label class="filter-chip"><input type="checkbox" data-filter="${qid}" ${state.filters[qid]?'checked':''} ${state.overallView?'disabled':''}> ${q.short}</label>
+    `).join('');
+    $('#filters').innerHTML = `
+      <label class="filter-chip" style="background:var(--primary-soft);color:#1d4ed8;font-weight:900"><input type="checkbox" data-overall="1" ${state.overallView?'checked':''}> 전체보기</label>
+      ${individual}
+    `;
+    const overall = $('#filters input[data-overall]');
+    overall.addEventListener('change', e => {
+      state.overallView = e.target.checked;
+      if(!state.overallView){
+        Object.keys(state.filters).forEach(qid => state.filters[qid] = false);
+      }
+      renderFilters();
+      renderNetwork(analyze(state.currentRound));
+    });
+    $$('#filters input[data-filter]').forEach(chk => chk.addEventListener('change', e => {
+      state.filters[e.target.dataset.filter] = e.target.checked;
+      renderNetwork(analyze(state.currentRound));
+    }));
+  }
+
+  function renderNetwork(data){
+    const container = $('#network');
+    if(!window.vis){ container.innerHTML = '<div class="empty">네트워크 라이브러리를 불러오지 못했습니다. 인터넷 연결 또는 CDN 차단 여부를 확인해 주세요.</div>'; return; }
+    if(state.network){ state.network.destroy(); state.network = null; }
+
+    const nodeItems = data.students.map(s => {
+      const st = data.stats[s.studentId];
+      const isMale = s.gender.includes('남');
+      const totalIn = st.totalIn || 0;
+      const baseColor = {background:isMale?'#86efac':'#fde68a', border:isMale?'#16a34a':'#ca8a04'};
+      return {
+        id:s.studentId,
+        label:`${s.name}`,
+        title:`${s.number}. ${s.name}\n긍정 받은 수: ${st.posIn}\n불편감 받은 수: ${st.negIn}`,
+        size:24 + Math.min(46, totalIn * 3.4),
+        color:baseColor,
+        originalColor:baseColor,
+        borderWidth:2,
+        font:{size:23, color:'#0f172a', face:'Pretendard, system-ui', strokeWidth:5, strokeColor:'#ffffff', vadjust:0}
+      };
+    });
+
+    const makeEdgeTitle = (items, byId) => items.map(r => {
+      const from = byId[r.respondentId]?.name || r.respondentId;
+      const to = byId[r.targetId]?.name || r.targetId;
+      return `${from} → ${to} · ${QUESTIONS[r.questionId]?.short || r.questionId}: ${getReasonText(r)}`;
+    }).join('\n');
+
+    let edgeItems = [];
+    if(state.overallView){
+      const pairMap = {};
+      data.responses.forEach(r => {
+        const ids = [r.respondentId, r.targetId].sort();
+        const key = `${ids[0]}|${ids[1]}|${r.relationType}`;
+        pairMap[key] = pairMap[key] || {a:ids[0], b:ids[1], relationType:r.relationType, ab:[], ba:[]};
+        if(r.respondentId === ids[0]) pairMap[key].ab.push(r); else pairMap[key].ba.push(r);
+      });
+      edgeItems = Object.values(pairMap).map((g, idx) => {
+        const isPos = g.relationType === 'positive';
+        const hasAB = g.ab.length > 0;
+        const hasBA = g.ba.length > 0;
+        const from = hasAB ? g.a : g.b;
+        const to = hasAB ? g.b : g.a;
+        const arrows = hasAB && hasBA
+          ? {to:{enabled:true, scaleFactor:.8}, from:{enabled:true, scaleFactor:.8}}
+          : {to:{enabled:true, scaleFactor:.8}};
+        return {
+          id:'e'+idx,
+          from,
+          to,
+          arrows,
+          label:'',
+          title:makeEdgeTitle([...g.ab, ...g.ba], data.byId),
+          color:{color:isPos?'#2563eb':'#ef4444'},
+          width:isPos?2.2:2.8,
+          dashes:!isPos,
+          smooth:{type:isPos?'dynamic':'curvedCW', roundness:.18},
+          font:{size:0}
+        };
+      });
+    }else{
+      const visible = data.responses.filter(r => state.filters[r.questionId]);
+      const grouped = {};
+      visible.forEach(r => {
+        const key = `${r.respondentId}>${r.targetId}>${r.relationType}>${r.questionId}`;
+        grouped[key] = grouped[key] || {from:r.respondentId, to:r.targetId, relationType:r.relationType, qs:[], items:[]};
+        grouped[key].qs.push(r.questionId);
+        grouped[key].items.push(r);
+      });
+      edgeItems = Object.values(grouped).map((g, idx) => {
+        const isPos = g.relationType === 'positive';
+        const qShort = Array.from(new Set(g.qs)).map(q=>QUESTIONS[q].short).join(', ');
+        return {
+          id:'e'+idx,
+          from:g.from,
+          to:g.to,
+          arrows:{to:{enabled:true, scaleFactor:.8}},
+          label:qShort,
+          title:makeEdgeTitle(g.items, data.byId),
+          color:{color:isPos?'#2563eb':'#ef4444'},
+          width:isPos?2.1:2.7,
+          dashes:!isPos,
+          smooth:{type:'dynamic'},
+          font:{size:12, align:'middle', color:'#334155', strokeWidth:3, strokeColor:'#ffffff'}
+        };
+      });
+    }
+
+    const nodesData = new vis.DataSet(nodeItems);
+    const edgesData = new vis.DataSet(edgeItems);
+    state.network = new vis.Network(container, {nodes:nodesData, edges:edgesData}, {
+      interaction:{hover:true, tooltipDelay:120, multiselect:false},
+      physics:{enabled:true, solver:'forceAtlas2Based', forceAtlas2Based:{gravitationalConstant:-90, centralGravity:.015, springLength:150, springConstant:.08}, stabilization:{iterations:120}},
+      edges:{smooth:{type:'dynamic'}, arrows:{to:{enabled:true, scaleFactor:.8}}},
+      nodes:{shape:'dot', borderWidth:2, shadow:false, font:{size:23}}
+    });
+
+    const resetNodes = () => {
+      nodesData.update(nodeItems.map(n => ({
+        id:n.id,
+        color:n.originalColor,
+        borderWidth:2,
+        font:{...n.font, color:'#0f172a'}
+      })));
+    };
+    state.network.on('click', params => {
+      if(!params.nodes || !params.nodes.length){ resetNodes(); return; }
+      const selected = params.nodes[0];
+      nodesData.update(nodeItems.map(n => n.id === selected
+        ? {id:n.id, color:n.originalColor, borderWidth:6, font:{...n.font, color:'#0f172a', size:25}}
+        : {id:n.id, color:{background:'#e5e7eb', border:'#cbd5e1'}, borderWidth:1, font:{...n.font, color:'#64748b', size:21}}
+      ));
+    });
+  }
+
+  function renderSignals(data){
+    $('#lowSignal').innerHTML = data.low.length ? data.low.map(s => `<div class="student-pill low"><div><strong>${s.number}. ${safeHtml(s.name)}</strong><br><small>받은 지목 ${s.totalIn}건</small></div><small>긍정 ${s.posIn} · 불편감 ${s.negIn}</small></div>`).join('') : '<div class="empty">표시할 학생이 없습니다.</div>';
+    $('#discomfortSignal').innerHTML = data.discomfort.length ? data.discomfort.map(s => `<div class="student-pill warn"><div><strong>${s.number}. ${safeHtml(s.name)}</strong><br><small>불편감 지목 ${s.negIn}건</small></div><small>긍정 ${s.posIn} · 전체 ${s.totalIn}</small></div>`).join('') : '<div class="empty">불편감 지목이 없습니다.</div>';
+  }
+
+  function renderWordcloud(data){
+    const entries = Object.entries(data.tagCounts).sort((a,b)=>b[1]-a[1]).slice(0,18);
+    if(!entries.length){ $('#wordSummary').textContent='긍정 이유 태그가 없습니다.'; $('#wordcloud').innerHTML='<span class="subtle">표시할 키워드가 없습니다.</span>'; return; }
+    const max = entries[0][1];
+    const top = entries.slice(0,2).map(x=>x[0]).join(' · ');
+    $('#wordSummary').textContent = `이번 회차에서 학생들이 많이 선택한 긍정 이유는 ‘${top}’입니다.`;
+    $('#wordcloud').innerHTML = entries.map(([word,count]) => {
+      const size = 14 + Math.round(count / max * 24);
+      return `<span class="word" title="${count}회" style="font-size:${size}px">${safeHtml(word)}<small>${count}</small></span>`;
+    }).join('');
+  }
+  function shortenWord(w){
+    return w.replace(/나랑 |평소에 |친구가 |친구들의 |매사에 |성격이 |활동에 /g,'')
+      .replace(/\(게임, 취미 등\)/g,'').replace(/ 때문에|해서|해 줘서|있어서|같아서|되기/g,'').trim();
+  }
+
+  function renderMatrix(data){
+    state.matrixDetails = {};
+    let detailIndex = 0;
+    const rows = data.students.map(from => {
+      const cells = data.students.map(to => {
+        if(from.studentId === to.studentId) return '<td style="background:#f8fafc;text-align:center;color:#94a3b8">—</td>';
+        const rs = data.responses.filter(r => r.respondentId === from.studentId && r.targetId === to.studentId);
+        const html = rs.map(r => {
+          const id = 'm' + (++detailIndex);
+          state.matrixDetails[id] = r;
+          return `<button type="button" class="chip matrix-chip ${r.relationType==='positive'?'pos':'neg'}" data-reason-id="${id}" title="사유 보기">${QUESTIONS[r.questionId].short}</button>`;
+        }).join('');
+        return `<td>${html}</td>`;
+      }).join('');
+      return `<tr><td>${from.number}. ${safeHtml(from.name)}</td>${cells}</tr>`;
+    }).join('');
+    const header = `<tr><th>응답자 / 선택친구</th>${data.students.map(s=>`<th>${s.number}. ${safeHtml(s.name)}</th>`).join('')}</tr>`;
+    $('#matrixWrap').innerHTML = `<table class="matrix-table">${header}${rows}</table>`;
+    $$('#matrixWrap .matrix-chip').forEach(btn => btn.addEventListener('click', e => {
+      const r = state.matrixDetails[e.currentTarget.dataset.reasonId];
+      if(r) openReasonModal(r, data);
+    }));
+  }
+
+  function openReasonModal(r, data){
+    const respondent = data.byId[r.respondentId];
+    const target = data.byId[r.targetId];
+    const q = QUESTIONS[r.questionId] || {short:r.questionId, label:r.questionId};
+    $('#reasonModalTitle').textContent = `${q.short} 문항 응답 사유`;
+    $('#reasonModalMeta').textContent = `${respondent ? respondent.number+'. '+respondent.name : r.respondentId} → ${target ? target.number+'. '+target.name : r.targetId} · ${r.relationType==='positive'?'긍정 관계':'불편감 관계'}`;
+    $('#reasonModalBody').innerHTML = `<p style="margin:0 0 8px"><strong>${safeHtml(q.label)}</strong></p><p style="margin:0">${safeHtml(getReasonText(r))}</p>`;
+    $('#reasonModal').classList.add('show');
+    $('#reasonModal').setAttribute('aria-hidden','false');
+  }
+
+  function closeReasonModal(){
+    $('#reasonModal').classList.remove('show');
+    $('#reasonModal').setAttribute('aria-hidden','true');
+  }
+
+  function renderRelationships(data){
+    const list = arr => arr.length ? `<ul>${arr.slice(0,12).map(x=>`<li>${safeHtml(x)}</li>`).join('')}</ul>` : '<p class="subtle">해당 관계가 없습니다.</p>';
+    $('#relationshipGrid').innerHTML = `
+      <div class="rel-box green"><h2>상호 긍정형</h2><p class="subtle">서로를 긍정 문항에서 지목한 관계</p>${list(data.mutualPositive)}</div>
+      <div class="rel-box blue"><h2>비대칭형</h2><p class="subtle">일방 불편감 관계를 우선 표시하고, 이어서 상호로 이어지지 않은 긍정 지목을 보여줍니다.</p>${list(data.asymmetric)}</div>
+      <div class="rel-box red"><h2>상호 불편감형</h2><p class="subtle">서로를 불편감 문항에서 지목한 관계</p>${list(data.mutualNegative)}</div>`;
+  }
+
+  function renderStudentResponses(data){
+    const selected = state.selectedStudentId || data.students[0]?.studentId;
+    state.selectedStudentId = selected;
+    $('#studentList').innerHTML = data.students.map(s => {
+      const sent = data.responses.filter(r=>r.respondentId===s.studentId).length;
+      const received = data.responses.filter(r=>r.targetId===s.studentId).length;
+      return `<button type="button" class="student-btn ${s.studentId===selected?'active':''}" data-student="${s.studentId}">${s.number}. ${safeHtml(s.name)} <span class="subtle">보낸 ${sent} · 받은 ${received}</span></button>`;
+    }).join('');
+    $$('#studentList .student-btn').forEach(btn => btn.addEventListener('click', e => {
+      state.selectedStudentId = e.currentTarget.dataset.student;
+      state.selectedStudentView = 'sent';
+      renderStudentResponses(analyze(state.currentRound));
+    }));
+    const student = data.byId[selected];
+    if(!student){ $('#studentResponseDetail').innerHTML='<div class="empty">학생을 선택하세요.</div>'; return; }
+    const sentCount = data.responses.filter(r=>r.respondentId===selected).length;
+    const receivedCount = data.responses.filter(r=>r.targetId===selected).length;
+    const posReceived = data.responses.filter(r=>r.targetId===selected && r.relationType==='positive').length;
+    const negReceived = data.responses.filter(r=>r.targetId===selected && r.relationType==='negative').length;
+    const view = state.selectedStudentView || 'sent';
+    const content = view === 'received' ? renderReceivedByStudent(selected, data) : renderSentByStudent(selected, data);
+    $('#studentResponseDetail').innerHTML = `
+      <h3>${student.number}. ${safeHtml(student.name)}</h3>
+      <div class="summary-strip">
+        <div class="mini"><strong>${sentCount}</strong><span class="subtle">응답한 관계</span></div>
+        <div class="mini"><strong>${posReceived}</strong><span class="subtle">긍정 지목받음</span></div>
+        <div class="mini"><strong>${negReceived}</strong><span class="subtle">불편감 지목받음</span></div>
+      </div>
+      <div class="student-detail-toolbar">
+        <button type="button" class="mode-btn ${view==='sent'?'active':''}" data-view="sent">학생이 응답한 내용</button>
+        <button type="button" class="mode-btn ${view==='received'?'active':''}" data-view="received">학생이 지목받은 내용</button>
+      </div>
+      ${content}`;
+    $$('#studentResponseDetail .mode-btn').forEach(btn => btn.addEventListener('click', e => {
+      state.selectedStudentView = e.currentTarget.dataset.view;
+      renderStudentResponses(analyze(state.currentRound));
+    }));
+  }
+
+  function relationClassForQuestion(qid){
+    return QUESTIONS[qid]?.type === 'negative' ? 'neg' : 'pos';
+  }
+
+  function renderSentByStudent(studentId, data){
+    return Object.entries(QUESTIONS).map(([qid,q]) => {
+      const typeClass = relationClassForQuestion(qid);
+      const rs = data.responses.filter(r=>r.respondentId===studentId && r.questionId===qid);
+      const items = rs.length ? rs.map(r => {
+        const target = data.byId[r.targetId];
+        const lineClass = r.relationType === 'negative' ? 'neg' : 'pos';
+        return `<li class="response-line ${lineClass}"><strong>${target ? target.number+'. '+safeHtml(target.name) : safeHtml(r.targetId)}</strong><span class="response-reason">${safeHtml(getReasonText(r))}</span></li>`;
+      }).join('') : '<li class="response-line"><span class="subtle">선택 없음</span></li>';
+      return `<div class="q-card ${typeClass}"><h4><span class="q-label">${qid}</span> ${q.label}</h4><ul>${items}</ul></div>`;
+    }).join('');
+  }
+
+  function renderReceivedSummary(studentId, data){
+    const received = data.responses.filter(r=>r.targetId===studentId);
+    const pos = received.filter(r=>r.relationType==='positive');
+    const neg = received.filter(r=>r.relationType==='negative');
+    const posSummary = summarizeReasons(received, 'positive').slice(0,8);
+    const negSummary = summarizeReasons(received, 'negative').slice(0,8);
+    const chips = (arr, cls) => arr.length
+      ? arr.map(([word,count]) => `<span class="keyword-chip ${cls}">${safeHtml(word)} <small>${count}</small></span>`).join('')
+      : '<span class="subtle">해당 응답이 없습니다.</span>';
+    return `
+      <div class="received-summary">
+        <h3 style="margin:0 0 10px">이 학생에 대한 응답 요약</h3>
+        <div class="summary-columns">
+          <div class="summary-box pos">
+            <h4>긍정적으로 지목된 이유 · ${pos.length}건</h4>
+            <div>${chips(posSummary, 'pos')}</div>
+          </div>
+          <div class="summary-box neg">
+            <h4>불편감으로 지목된 이유 · ${neg.length}건</h4>
+            <div>${chips(negSummary, 'neg')}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderReceivedByStudent(studentId, data){
+    const summary = renderReceivedSummary(studentId, data);
+    const detail = Object.entries(QUESTIONS).map(([qid,q]) => {
+      const typeClass = relationClassForQuestion(qid);
+      const rs = data.responses.filter(r=>r.targetId===studentId && r.questionId===qid);
+      const items = rs.length ? rs.map(r => {
+        const respondent = data.byId[r.respondentId];
+        const tagClass = r.relationType === 'positive' ? 'pos' : 'neg';
+        const label = r.relationType === 'positive' ? '긍정' : '불편감';
+        return `<li class="response-line ${tagClass}"><strong>${respondent ? respondent.number+'. '+safeHtml(respondent.name) : safeHtml(r.respondentId)} <span class="received-tag ${tagClass}">${label}</span></strong><span class="response-reason">${safeHtml(getReasonText(r))}</span></li>`;
+      }).join('') : '<li class="response-line"><span class="subtle">지목받은 응답 없음</span></li>';
+      return `<div class="q-card ${typeClass}"><h4><span class="q-label">${qid}</span> ${q.label}</h4><ul>${items}</ul></div>`;
+    }).join('');
+    return summary + detail;
+  }
+
+  function renderRawTable(data){
+    const rows = data.responses.map(r => {
+      const respondent = data.byId[r.respondentId], target = data.byId[r.targetId];
+      return `<tr><td>${respondent ? respondent.name : r.respondentId}</td><td>${r.questionId} ${QUESTIONS[r.questionId].short}</td><td>${target ? target.name : r.targetId}</td><td>${r.relationType==='positive'?'긍정':'불편감'}</td><td>${safeHtml(r.tags || r.customReason || '이유 선택 없이 저장')}</td><td>${safeHtml(r.timestamp)}</td></tr>`;
+    }).join('');
+    $('#rawTableWrap').innerHTML = `<table class="raw-table"><thead><tr><th>응답 학생</th><th>문항</th><th>선택한 친구</th><th>관계</th><th>선택 이유</th><th>시각</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function showStatus(message, type){
+    const el = $('#loadStatus');
+    el.textContent = message;
+    el.className = 'status ' + (type || '');
+  }
+
+  $('#reasonModalClose').addEventListener('click', closeReasonModal);
+  $('#reasonModal').addEventListener('click', e => { if(e.target.id === 'reasonModal') closeReasonModal(); });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && $('#reasonModal').classList.contains('show')) closeReasonModal(); });
+
+
+  const surveyLink = $('#surveyLink');
+  const surveyLinkInput = $('#surveyLinkInput');
+  $('#editSurveyLinkBtn').addEventListener('click', () => {
+    $('#linkEditor').classList.toggle('show');
+    surveyLinkInput.focus();
+  });
+  $('#saveSurveyLinkBtn').addEventListener('click', () => {
+    const url = norm(surveyLinkInput.value);
+    if(!url){ showStatus('설문 링크 주소를 입력해 주세요.', 'warn'); return; }
+    surveyLink.href = url;
+    $('#linkEditor').classList.remove('show');
+    showStatus('설문 링크가 현재 화면에 적용되었습니다. 다시 열면 기본 링크로 돌아갑니다.', 'ok');
+  });
+
+  $('#fileInput').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if(!file) return;
+    try{
+      if(!window.XLSX) throw new Error('Excel 파싱 라이브러리를 불러오지 못했습니다. 인터넷 연결 또는 CDN 차단 여부를 확인해 주세요.');
+      showStatus('파일을 읽는 중입니다...', 'warn');
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, {type:'array'});
+      const parsed = parseWorkbook(workbook);
+      state.students = parsed.students;
+      state.responses = parsed.responses;
+      state.rounds = parsed.rounds;
+      state.currentRound = parsed.rounds[0];
+      state.selectedStudentId = parsed.students[0]?.studentId || null;
+      $('#roundSelect').innerHTML = state.rounds.map(r=>`<option value="${safeHtml(r)}">${safeHtml(r)}</option>`).join('');
+      $('#dashboard').style.display = 'block';
+      showStatus(`분석 준비 완료\n자료 유형: ${parsed.sourceType || '응답 데이터'}\n학생 ${state.students.length}명, 응답 ${state.responses.length}건, 회차 ${state.rounds.length}개를 읽었습니다.${parsed.skipped ? '\n단, 형식이 맞지 않아 제외된 응답 '+parsed.skipped+'건이 있습니다.' : ''}`, 'ok');
+      renderAll();
+      window.scrollTo({top:$('#dashboard').offsetTop-10, behavior:'smooth'});
+    }catch(err){
+      console.error(err);
+      showStatus('오류: ' + err.message, 'err');
+      $('#dashboard').style.display = 'none';
+    }
+  });
+
+  $('#roundSelect').addEventListener('change', () => renderAll());
+  $$('.tab-btn').forEach(btn => btn.addEventListener('click', e => {
+    $$('.tab-btn').forEach(b=>b.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    $$('.panel').forEach(p=>p.classList.remove('active'));
+    $('#'+e.currentTarget.dataset.tab).classList.add('active');
+    if(e.currentTarget.dataset.tab === 'tabDashboard' && state.currentRound) setTimeout(()=>renderNetwork(analyze(state.currentRound)), 50);
+  }));
+})();
+</script>
+</body>
+</html>
