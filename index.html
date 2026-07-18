@@ -654,6 +654,8 @@
         const arrows = hasAB && hasBA
           ? {to:{enabled:true, scaleFactor:.8}, from:{enabled:true, scaleFactor:.8}}
           : {to:{enabled:true, scaleFactor:.8}};
+        const edgeColor = isPos ? '#2563eb' : '#ef4444';
+        const edgeWidth = isPos ? 2.2 : 2.8;
         return {
           id:'e'+idx,
           from,
@@ -661,8 +663,11 @@
           arrows,
           label:'',
           title:makeEdgeTitle([...g.ab, ...g.ba], data.byId),
-          color:{color:isPos?'#2563eb':'#ef4444'},
-          width:isPos?2.2:2.8,
+          relationType:g.relationType,
+          originalColor:edgeColor,
+          originalWidth:edgeWidth,
+          color:{color:edgeColor, highlight:edgeColor, hover:edgeColor, opacity:1},
+          width:edgeWidth,
           dashes:!isPos,
           smooth:{type:isPos?'dynamic':'curvedCW', roundness:.18},
           font:{size:0}
@@ -680,6 +685,8 @@
       edgeItems = Object.values(grouped).map((g, idx) => {
         const isPos = g.relationType === 'positive';
         const qShort = Array.from(new Set(g.qs)).map(q=>QUESTIONS[q].short).join(', ');
+        const edgeColor = isPos ? '#2563eb' : '#ef4444';
+        const edgeWidth = isPos ? 2.1 : 2.7;
         return {
           id:'e'+idx,
           from:g.from,
@@ -687,8 +694,11 @@
           arrows:{to:{enabled:true, scaleFactor:.8}},
           label:qShort,
           title:makeEdgeTitle(g.items, data.byId),
-          color:{color:isPos?'#2563eb':'#ef4444'},
-          width:isPos?2.1:2.7,
+          relationType:g.relationType,
+          originalColor:edgeColor,
+          originalWidth:edgeWidth,
+          color:{color:edgeColor, highlight:edgeColor, hover:edgeColor, opacity:1},
+          width:edgeWidth,
           dashes:!isPos,
           smooth:{type:'dynamic'},
           font:{size:12, align:'middle', color:'#334155', strokeWidth:3, strokeColor:'#ffffff'}
@@ -714,8 +724,8 @@
       })));
       edgesData.update(edgeItems.map(e => ({
         id:e.id,
-        color:e.color,
-        width:e.width,
+        color:{color:e.originalColor, highlight:e.originalColor, hover:e.originalColor, opacity:1},
+        width:e.originalWidth || e.width,
         dashes:e.dashes,
         font:e.font ? {...e.font} : undefined
       })));
@@ -730,8 +740,20 @@
       edgesData.update(edgeItems.map(e => {
         const related = e.from === selected || e.to === selected;
         return related
-          ? {id:e.id, color:e.color, width:(e.width || 2) + 1.2, dashes:e.dashes, font:e.font ? {...e.font, color:'#0f172a'} : undefined}
-          : {id:e.id, color:{color:'#cbd5e1'}, width:1, dashes:e.dashes, font:e.font ? {...e.font, color:'#94a3b8'} : undefined};
+          ? {
+              id:e.id,
+              color:{color:e.originalColor, highlight:e.originalColor, hover:e.originalColor, opacity:1},
+              width:(e.originalWidth || e.width || 2) + 1.2,
+              dashes:e.dashes,
+              font:e.font ? {...e.font, color:'#0f172a'} : undefined
+            }
+          : {
+              id:e.id,
+              color:{color:'#cbd5e1', highlight:'#cbd5e1', hover:'#cbd5e1', opacity:.45},
+              width:1,
+              dashes:e.dashes,
+              font:e.font ? {...e.font, color:'#94a3b8'} : undefined
+            };
       }));
     });
   }
